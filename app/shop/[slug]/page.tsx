@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../lib/api';
 
+import { Container, Box, Typography, CircularProgress } from '@mui/material';
+import ProductActionBar from '../../../components/ProductActionBar';
+
 interface ProductDetail {
   id: string;
   title: string;
@@ -18,6 +21,8 @@ interface ProductVariant {
   id: string;
   name: string;
   price: number;
+  sellingPrice?: number;
+  image?: string;
   // Add other variant properties like color, size, etc.
 }
 
@@ -30,11 +35,12 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
   useEffect(() => {
     const fetchProduct = async () => {
+      if (!slug) return;
       try {
         const response = await api.get(`/public/api/v1/products/${slug}`);
-        setProduct(response.data); // Assuming response.data is a single product object
+        setProduct(response.data);
         if (response.data.variants && response.data.variants.length > 0) {
-          setSelectedVariant(response.data.variants[0]); // Select first variant by default
+          setSelectedVariant(response.data.variants[0]);
         }
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to fetch product details.');
@@ -43,81 +49,93 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
       }
     };
 
-    if (slug) {
-      fetchProduct();
-    }
+    fetchProduct();
   }, [slug]);
+
+  const handleVariantChange = (variant: ProductVariant) => {
+    setSelectedVariant(variant);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        Chargement du produit...
-      </div>
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'black' }}>
+        <CircularProgress color="primary" />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-red-500 flex items-center justify-center">
-        Erreur: {error}
-      </div>
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'black' }}>
+        <Typography color="error">Erreur: {error}</Typography>
+      </Box>
     );
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        Produit introuvable.
-      </div>
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'black' }}>
+        <Typography color="white">Produit introuvable.</Typography>
+      </Box>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white py-12">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-1/2">
-            <img src={product.imageUrl} alt={product.title} className="w-full h-auto rounded-lg shadow-lg" />
-          </div>
-          <div className="md:w-1/2">
-            <h1 className="text-4xl font-bold mb-4">{product.title}</h1>
-            <p className="text-2xl font-bold text-blue-400 mb-6">{(selectedVariant?.sellingPrice || selectedVariant?.price)?.toFixed(2)} $</p>
-            <div
-              className="text-gray-300 mb-6"
-              dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
-            />
+    <Box sx={{ bgcolor: 'black', color: 'white', pb: '120px', pt: '100px' }}>
+      <Container maxWidth="md" sx={{ py: 5 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          textAlign: 'center', 
+          gap: 4 
+        }}>
+          <Typography variant="h3" component="h1" fontWeight="bold">
+            {product.title}
+          </Typography>
 
-            {product.variants && product.variants.length > 0 && (
-              <div className="mb-6">
-                <label htmlFor="variant-select" className="block text-gray-400 text-sm font-bold mb-2">
-                  Sélectionner une variante:
-                </label>
-                <select
-                  id="variant-select"
-                  className="block appearance-none w-full bg-gray-800 border border-gray-700 text-white py-2 px-3 rounded-md leading-tight focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  value={selectedVariant?.id || ''}
-                  onChange={(e) => {
-                    const variant = product.variants.find(v => v.id === e.target.value);
-                    if (variant) setSelectedVariant(variant);
-                  }}
-                >
-                  {product.variants.map((variant) => (
-                    <option key={variant.id} value={variant.id}>
-                      {variant.name} - {variant.price} €
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+          <Box 
+            component="img"
+            src={selectedVariant?.image || product.imageUrl}
+            alt={product.title}
+            sx={{ 
+              width: '100%', 
+              maxWidth: '500px', 
+              height: 'auto', 
+              borderRadius: '1rem', 
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)' 
+            }}
+          />
 
-            <button
-              className="bg-blue-600 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition-colors duration-300"
-            >
-              Ajouter au panier
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+          <Typography variant="h4" fontWeight="bold" color="primary.light">
+            {(selectedVariant?.sellingPrice || selectedVariant?.price || product.price).toFixed(2)} €
+          </Typography>
+
+          <Typography 
+            variant="body1" 
+            color="grey.300"
+            sx={{ 
+              maxWidth: '70ch', 
+              lineHeight: 1.8, 
+              '& img': { 
+                maxWidth: '100%', 
+                height: 'auto', 
+                borderRadius: '0.75rem', 
+                my: 2 
+              } 
+            }}
+            dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
+          />
+        </Box>
+      </Container>
+
+      {product.variants && product.variants.length > 0 && (
+        <ProductActionBar 
+          variants={product.variants}
+          selectedVariant={selectedVariant}
+          onVariantChange={handleVariantChange}
+        />
+      )}
+    </Box>
   );
 }

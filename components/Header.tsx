@@ -1,59 +1,187 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../providers/AuthProvider';
+import { AppBar, Toolbar, Typography, Button, IconButton, Badge, Box, Container, useMediaQuery, useTheme } from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import LoginIcon from '@mui/icons-material/Login';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
+  const [cartCount] = useState(0); // TODO: Connect to cart state
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="bg-black text-white py-4 shadow-lg">
-      <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-white hover:text-gray-300 transition-colors duration-300">
-          Watchtech
-        </Link>
-        <nav className="hidden md:block">
-          <ul className="flex space-x-6">
-            <li>
-              <Link href="/" className="hover:text-blue-400 transition-colors duration-300">
-                Accueil
-              </Link>
-            </li>
-            <li>
-              <Link href="/shop" className="hover:text-blue-400 transition-colors duration-300">
-                Boutique
-              </Link>
-            </li>
-            {/* Add more navigation links as needed */}
-          </ul>
-        </nav>
-        <div className="flex items-center space-x-4">
-          {isAuthenticated ? (
-            <button
-              onClick={logout}
-              className="text-white hover:text-blue-400 transition-colors duration-300"
+    <AppBar
+      position="fixed"
+      elevation={scrolled ? 4 : 0}
+      sx={{
+        backgroundColor: scrolled ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.4)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+        transition: 'all 0.3s ease',
+      }}
+    >
+      <Container maxWidth="xl">
+        <Toolbar
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            minHeight: '80px',
+            gap: 2,
+          }}
+        >
+          {/* Left Section - Auth Links */}
+          <Box sx={{ display: 'flex', gap: isMobile ? 1 : 2, justifyContent: 'flex-start', alignItems: 'center' }}>
+            {isAuthenticated ? (
+              <Button
+                onClick={logout}
+                sx={{
+                  color: '#9ca3af',
+                  textTransform: 'none',
+                  fontSize: '0.875rem',
+                  fontWeight: 300,
+                  '&:hover': {
+                    color: '#fff',
+                    backgroundColor: 'transparent',
+                  },
+                }}
+              >
+                Se déconnecter
+              </Button>
+            ) : (
+              <>
+                {isMobile ? (
+                  <>
+                    <IconButton component={Link} href="/register" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="S'inscrire">
+                      <PersonAddIcon />
+                    </IconButton>
+                    <IconButton component={Link} href="/login" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Se connecter">
+                      <LoginIcon />
+                    </IconButton>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      component={Link}
+                      href="/register"
+                      sx={{
+                        color: '#9ca3af',
+                        textTransform: 'none',
+                        fontSize: '0.875rem',
+                        fontWeight: 300,
+                        '&:hover': {
+                          color: '#fff',
+                          backgroundColor: 'transparent',
+                        },
+                      }}
+                    >
+                      S'inscrire
+                    </Button>
+                    <Button
+                      component={Link}
+                      href="/login"
+                      sx={{
+                        color: '#9ca3af',
+                        textTransform: 'none',
+                        fontSize: '0.875rem',
+                        fontWeight: 300,
+                        '&:hover': {
+                          color: '#fff',
+                          backgroundColor: 'transparent',
+                        },
+                      }}
+                    >
+                      Se connecter
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
+          </Box>
+
+          {/* Center Section - Logo */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', position: isMobile ? 'absolute' : 'static', left: '50%', transform: isMobile ? 'translateX(-50%)' : 'none' }}>
+            <Link href="/" style={{ textDecoration: 'none' }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 700,
+                  color: '#fff',
+                  letterSpacing: '-0.02em',
+                  cursor: 'pointer',
+                  transition: 'opacity 0.3s',
+                  '&:hover': {
+                    opacity: 0.8,
+                  },
+                }}
+              >
+                Waltech
+              </Typography>
+            </Link>
+          </Box>
+
+          {/* Right Section - Icons */}
+          <Box sx={{ display: 'flex', gap: isMobile ? 1 : 2, justifyContent: 'flex-end', alignItems: 'center' }}>
+            <IconButton
+              component={Link}
+              href="/wishlist"
+              sx={{
+                color: '#9ca3af',
+                '&:hover': {
+                  color: '#fff',
+                  backgroundColor: 'transparent',
+                },
+              }}
+              aria-label="Liste de souhaits"
             >
-              Se déconnecter
-            </button>
-          ) : (
-            <>
-              <Link href="/login" className="text-white hover:text-blue-400 transition-colors duration-300">
-                Se connecter
-              </Link>
-              <Link href="/register" className="text-white hover:text-blue-400 transition-colors duration-300">
-                S'inscrire
-              </Link>
-            </>
-          )}
-          {/* Cart Icon */}
-          <Link href="/cart" className="text-white hover:text-blue-400 transition-colors duration-300">
-            {/* Placeholder for cart icon */}
-            🛒
-          </Link>
-        </div>
-      </div>
-    </header>
+              <FavoriteIcon />
+            </IconButton>
+
+            <IconButton
+              component={Link}
+              href="/cart"
+              sx={{
+                color: '#9ca3af',
+                '&:hover': {
+                  color: '#fff',
+                  backgroundColor: 'transparent',
+                },
+              }}
+              aria-label="Panier"
+            >
+              <Badge
+                badgeContent={cartCount}
+                sx={{
+                  '& .MuiBadge-badge': {
+                    backgroundColor: '#fff',
+                    color: '#000',
+                    fontWeight: 600,
+                  },
+                }}
+              >
+                <ShoppingBagIcon />
+              </Badge>
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </Container>
+    </AppBar>
   );
 };
 

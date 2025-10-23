@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import api from '../lib/api';
 import { useAuth } from "../providers/AuthProvider";
+import HorizontalProductGrid from '../components/HorizontalProductGrid';
+import { Button, Box } from '@mui/material';
+import Link from 'next/link';
 
 interface ShopInfo {
   name: string;
@@ -65,74 +69,173 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-black text-white">
-      {/* Shop Header Section */}
-      <header className="text-center py-8">
-        {shopInfo?.themeCustomization?.logo && (
-          <img
-            src={shopInfo.themeCustomization.logo}
-            alt={`${shopInfo.name} Logo`}
-            className="mx-auto mb-4 max-h-24"
-          />
-        )}
-        <h1 className="text-5xl font-bold mb-2">{shopInfo?.name || 'Notre Boutique'}</h1>
-        {shopInfo?.themeCustomization?.description && (
-          <div
-            className="text-xl text-gray-300"
-            dangerouslySetInnerHTML={{ __html: shopInfo.themeCustomization.description }}
-          />
-        )}
-      </header>
+    <div className="min-h-screen bg-black text-white">
+      {/* Hero Section */}
+      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-black to-black" />
+        
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="text-5xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent"
+            >
+              {shopInfo?.name || 'Waltech'}
+            </motion.h1>
+            
+            {shopInfo?.themeCustomization?.description && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="text-xl lg:text-2xl text-gray-400 max-w-3xl mx-auto mb-12"
+                dangerouslySetInnerHTML={{ __html: shopInfo.themeCustomization.description }}
+              />
+            )}
 
-      {/* Authentication Section (if not authenticated) */}
-      {!isAuthenticated && (
-        <div className="text-center py-8">
-          <p className="text-gray-400 mb-4">Connectez-vous ou inscrivez-vous pour une meilleure expérience.</p>
-          <div className="flex gap-4 justify-center">
-            <a href="/login" className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors duration-300">
-              Se connecter
-            </a>
-            <a href="/register" className="bg-gray-700 text-white px-6 py-3 rounded-md hover:bg-gray-600 transition-colors duration-300">
-              S'inscrire
-            </a>
-          </div>
+            <br /><br /><br /><br />
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, justifyContent: 'center', alignItems: 'center' }}>
+                <Button
+                  component={Link}
+                  href="/shop"
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    borderRadius: '9999px',
+                    px: 4,
+                    py: 1.5,
+                    bgcolor: 'white',
+                    color: 'black',
+                    '&:hover': { bgcolor: 'grey.200' }
+                  }}
+                >
+                  Découvrir la Collection
+                </Button>
+                {!isAuthenticated && (
+                  <Button
+                    component={Link}
+                    href="/register"
+                    variant="outlined"
+                    size="large"
+                    sx={{
+                      borderRadius: '9999px',
+                      px: 4,
+                      py: 1.5,
+                      borderColor: 'white',
+                      color: 'white',
+                      '&:hover': { borderColor: 'grey.400', bgcolor: 'rgba(255, 255, 255, 0.1)' }
+                    }}
+                  >
+                    Créer un Compte
+                  </Button>
+                )}
+              </Box>
+            </motion.div>
+          </motion.div>
         </div>
-      )}
 
-      {/* Products Section */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-12">Nos Produits</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {products.map((product) => (
-              <div key={product.id} className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-                <img src={product.variants?.[0]?.image || 'https://via.placeholder.com/400x300/000000/FFFFFF?text=Produit'} alt={product.title} className="w-full h-48 object-cover" />
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">{product.title}</h3>
-                  <p className="text-lg font-bold text-blue-400 mb-4">{(product.variants?.[0]?.sellingPrice || product.variants?.[0]?.price)?.toFixed(2)} $</p>
-                  <a href={`/shop/${product.slug}`}
-                     className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
-                    Voir les détails
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <br />
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="w-6 h-10 border-2 border-gray-600 rounded-full flex justify-center pt-2"
+          >
+            <div className="w-1 h-2 bg-gray-600 rounded-full" />
+          </motion.div>
+        </motion.div>
       </section>
 
-      {/* Authenticated User Info (if authenticated) */}
-      {isAuthenticated && (
-        <div className="text-center py-8">
-          <h3 className="text-2xl font-bold mb-4">Bienvenue, {user?.email || 'Utilisateur'}!</h3>
-          <button
-            onClick={logout}
-            className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors duration-300"
-          >
-            Se déconnecter
-          </button>
-        </div>
+      {/* Featured Products Section */}
+      {products.length > 0 && (
+        <HorizontalProductGrid
+          title="Les Incontournables"
+          products={products}
+        />
       )}
+
+      {/* Welcome Section for Authenticated Users */}
+      {isAuthenticated && user && (
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="py-16 max-w-7xl mx-auto px-6 lg:px-8 text-center"
+        >
+          <h3 className="text-3xl font-bold mb-4">
+            Bienvenue, {user?.email?.split('@')[0] || 'Utilisateur'}!
+          </h3>
+          <p className="text-gray-400 mb-6">
+            Profitez d'une expérience personnalisée et d'offres exclusives.
+          </p>
+        </motion.section>
+      )}
+
+      <br /><br /><br />
+
+      {/* CTA Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="py-24 bg-gradient-to-b from-black to-gray-900"
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+          <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+            Redéfinissez votre Style
+          </h2>
+          <p className="text-xl text-gray-400 mb-16 max-w-2xl mx-auto">
+            Découvrez notre collection exclusive de montres intelligentes qui allient technologie de pointe et design raffiné.
+          </p>
+
+          <br /><br />
+          <Button
+            component={Link}
+            href="/shop"
+            variant="contained"
+            size="large"
+            sx={{
+              borderRadius: '9999px',
+              px: 5,
+              py: 2,
+              bgcolor: 'white',
+              color: 'black',
+              '&:hover': { bgcolor: 'grey.200' }
+            }}
+          >
+            Explorer Maintenant
+          </Button>
+        </div>
+        
+        <br /><br /><br />
+      </motion.section>
+
+      
     </div>
   );
 }

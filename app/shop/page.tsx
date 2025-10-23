@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import api from '../../lib/api';
+import ProductCard from '../../components/ProductCard';
 
 interface Product {
   id: string;
@@ -49,29 +51,65 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white py-12">
-      <div className="container mx-auto px-4">
-        <h1 className="text-5xl font-bold text-center mb-12">Notre Collection</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <div key={product.id} className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-              <img src={product.imageUrl || 'https://via.placeholder.com/400x300/000000/FFFFFF?text=Produit'} alt={product.title} className="w-full h-48 object-cover" />
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-2">{product.title}</h2>
-                <div
-                  className="text-gray-400 text-sm mb-4"
-                  dangerouslySetInnerHTML={{ __html: product.description.substring(0, 100) + '...' }}
-                />
-                <p className="text-lg font-bold text-blue-400 mb-4">{product.price} €</p>
-                <a href={`/shop/${product.slug}`}
-                   className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-300">
-                  Voir les détails
-                </a>
-              </div>
-            </div>
-          ))}
+    <div className="min-h-screen bg-black text-white">
+      {/* Page Header */}
+      <section className="relative py-16 lg:py-24 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent"
+          >
+            Notre Collection
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-xl text-gray-400 max-w-2xl mx-auto"
+          >
+            Découvrez notre sélection exclusive de montres intelligentes alliant technologie et élégance.
+          </motion.p>
         </div>
-      </div>
+      </section>
+
+      {/* Products Grid */}
+      <section className="py-12 lg:py-16">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+            {products.map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+              >
+                <ProductCard
+                  id={product.id}
+                  title={product.title}
+                  slug={product.slug}
+                  price={product.variants?.[0]?.sellingPrice || product.variants?.[0]?.price || product.price || 0}
+                  image={product.variants?.[0]?.image || product.imageUrl || ''}
+                  variants={product.variants}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Empty State */}
+          {products.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="text-center py-16"
+            >
+              <p className="text-2xl text-gray-500">Aucun produit disponible pour le moment.</p>
+            </motion.div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

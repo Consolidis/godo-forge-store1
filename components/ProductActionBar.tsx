@@ -1,13 +1,14 @@
 "use client";
 
-import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Avatar, Tooltip, useTheme, useMediaQuery, IconButton } from '@mui/material';
+import React, { useState } from 'react';
+import { AppBar, Toolbar, Typography, Button, Box, Avatar, Tooltip, useTheme, useMediaQuery, IconButton, Snackbar } from '@mui/material';
 import { AddShoppingCart } from '@mui/icons-material';
 
 interface ProductVariant {
   id: string;
   name: string;
   price: number;
+  sellingPrice?: number;
   image?: string; // Assuming variants have images
 }
 
@@ -20,6 +21,26 @@ interface ProductActionBarProps {
 const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedVariant, onVariantChange }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  const handleVariantClick = (variant: ProductVariant) => {
+    onVariantChange(variant);
+    if (isMobile) {
+      const price = variant.sellingPrice;
+      if (price) {
+        setSnackbarMessage(`${price.toFixed(2)} $`);
+        setSnackbarOpen(true);
+      }
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
+  const displayPrice = selectedVariant?.sellingPrice;
+  const isButtonDisabled = !displayPrice;
 
   return (
     <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.9)', backdropFilter: 'blur(10px)' }}>
@@ -33,7 +54,7 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
               <Avatar
                 src={variant.image || 'https://via.placeholder.com/40'} // Fallback image
                 alt={variant.name}
-                onClick={() => onVariantChange(variant)}
+                onClick={() => handleVariantClick(variant)}
                 sx={{
                   width: 48,
                   height: 48,
@@ -56,12 +77,16 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
           <IconButton
             color="secondary"
             size="large"
+            disabled={isButtonDisabled}
             sx={{
               ml: 1.5,
               bgcolor: 'white',
               color: 'black',
               '&:hover': {
                 bgcolor: 'grey.200'
+              },
+              '&.Mui-disabled': {
+                bgcolor: 'grey.400'
               }
             }}
           >
@@ -72,21 +97,34 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
             variant="contained"
             color="secondary"
             size="large"
+            disabled={isButtonDisabled}
             startIcon={<AddShoppingCart />}
             sx={{
               ml: 2,
-              minWidth: '180px',
+              minWidth: '220px', // Increased width to accommodate price
               bgcolor: 'white',
               color: 'black',
               '&:hover': {
                 bgcolor: 'grey.200'
+              },
+              '&.Mui-disabled': {
+                bgcolor: 'grey.400',
+                color: 'grey.700'
               }
             }}
           >
-            Ajouter au Panier
+            Ajouter au Panier {displayPrice ? `(${displayPrice.toFixed(2)} $)` : ''}
           </Button>
         )}
       </Toolbar>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{ bottom: { xs: 90, sm: 90 } }} // Position above the action bar
+      />
     </AppBar>
   );
 };

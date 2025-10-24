@@ -108,7 +108,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           />
 
           <Typography variant="h4" fontWeight="bold" color="primary.light">
-            {(selectedVariant?.sellingPrice || selectedVariant?.price || product.price).toFixed(2)} €
+            {selectedVariant?.sellingPrice ? `${selectedVariant.sellingPrice.toFixed(2)} $` : ''}
           </Typography>
 
           <Typography 

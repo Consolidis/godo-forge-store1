@@ -108,7 +108,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </Link>
 
           <Typography variant="h5" color="text.primary" sx={{ fontWeight: 'bold', my: 2 }}>
-            {displayPrice?.toFixed(2)} €
+            {displayPrice?.toFixed(2)} $
           </Typography>
 
           {displayVariants.length > 0 && (

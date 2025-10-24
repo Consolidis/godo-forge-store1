@@ -39,17 +39,19 @@ const api = axios.create({
 // Interceptor to add API Key and Host header for all requests
 api.interceptors.request.use(
   (config) => {
+    let token = null;
+    // This code will only run on the client-side, where `window` is defined
     if (typeof window !== 'undefined') {
-      // Add Host header for shop identification
-      config.headers['X-Shop-Domain'] = window.location.hostname; // Or a more specific shop identifier
+      config.headers['X-Shop-Domain'] = window.location.hostname;
+      token = localStorage.getItem('jwt_token');
     }
 
-    // Add JWT token if available (for authenticated customer requests)
-    const token = localStorage.getItem('jwt_token'); // Or from HTTP-only cookie
+    // For server-side requests, the X-Shop-Domain header should be passed in the request config.
+    
+    // Use JWT token if it was found, otherwise fall back to the API Key
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     } else if (API_KEY) {
-      // If no JWT, use API Key for public routes
       config.headers.Authorization = `Bearer ${API_KEY}`;
     }
 

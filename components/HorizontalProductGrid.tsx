@@ -7,15 +7,7 @@ import ProductCard from './ProductCard';
 import { Box, IconButton } from '@mui/material';
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 
-interface Product {
-  id: string;
-  title: string;
-  slug: string;
-  description?: string;
-  imageUrl?: string;
-  price?: number;
-  variants?: any[];
-}
+import { Product } from '@/types';
 
 interface HorizontalProductGridProps {
   title?: string;

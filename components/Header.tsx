@@ -8,6 +8,8 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { usePathname, useRouter } from 'next/navigation';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -15,6 +17,9 @@ const Header: React.FC = () => {
   const [cartCount] = useState(0); // TODO: Connect to cart state
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const pathname = usePathname();
+  const router = useRouter();
+  const isShopPage = pathname.startsWith('/shop/');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,9 +73,15 @@ const Header: React.FC = () => {
               <>
                 {isMobile ? (
                   <>
-                    <IconButton component={Link} href="/register" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="S'inscrire">
-                      <PersonAddIcon />
-                    </IconButton>
+                    {isShopPage ? (
+                      <IconButton onClick={() => router.back()} sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Retour">
+                        <ArrowBackIcon />
+                      </IconButton>
+                    ) : (
+                      <IconButton component={Link} href="/register" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="S'inscrire">
+                        <PersonAddIcon />
+                      </IconButton>
+                    )}
                     <IconButton component={Link} href="/login" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Se connecter">
                       <LoginIcon />
                     </IconButton>

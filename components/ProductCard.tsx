@@ -6,15 +6,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardMedia, Typography, Button, Box, CardActions } from '@mui/material';
 import { AddShoppingCart } from '@mui/icons-material';
 
-interface Variant {
-  id: string;
-  color?: string;
-  colorName?: string;
-  image?: string;
-  price?: number;
-  sellingPrice?: number;
-  stock?: number;
-}
+import { ProductVariant } from '@/types';
 
 interface ProductCardProps {
   id: string;
@@ -22,7 +14,7 @@ interface ProductCardProps {
   slug: string;
   price: number;
   image: string;
-  variants?: Variant[];
+  variants?: ProductVariant[];
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({

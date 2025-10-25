@@ -1,11 +1,11 @@
 "use client";
 
-"use client";
-
 import React, { useState } from 'react';
 import api from '../../lib/api';
-import { Box, Button, Container, TextField, Typography, Link as MuiLink, CircularProgress } from '@mui/material'; // Import MUI components
-import Link from 'next/link'; // Import Next.js Link
+import { Box, Button, Container, TextField, Typography, Link as MuiLink, CircularProgress } from '@mui/material';
+import Link from 'next/link';
+import { useCartStore } from '@/store/cartStore'; // Import useCartStore
+import { useWishlistStore } from '@/store/wishlistStore'; // Import useWishlistStore
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -41,12 +41,31 @@ export default function RegisterPage() {
         lastName,
       }, { headers });
 
-      const { token } = response.data;
+      const { token, cart, wishlist } = response.data; // Extract cart and wishlist from response
       if (token) {
         localStorage.setItem('jwt_token', token);
         localStorage.removeItem('guest_cart_token');
         localStorage.removeItem('guest_wishlist_token');
         setSuccess('Registration successful! You are now logged in.');
+
+        // Update Zustand stores directly
+        if (cart) {
+          useCartStore.getState().setCart(cart);
+          if (cart.guestToken) { // Update guest cart token in localStorage if returned
+            localStorage.setItem('guest_cart_token', cart.guestToken);
+          } else {
+            localStorage.removeItem('guest_cart_token');
+          }
+        }
+        if (wishlist) {
+          useWishlistStore.getState().setWishlist(wishlist);
+          if (wishlist.guestToken) { // Update guest wishlist token in localStorage if returned
+            localStorage.setItem('guest_wishlist_token', wishlist.guestToken);
+          } else {
+            localStorage.removeItem('guest_wishlist_token');
+          }
+        }
+
         window.location.href = '/';
       } else {
         setSuccess('Registration successful! Please check your email to confirm your account.');

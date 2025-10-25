@@ -3,8 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../lib/api';
 
-import { Container, Box, Typography, CircularProgress } from '@mui/material';
+import { Container, Box, Typography, CircularProgress, IconButton } from '@mui/material';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ProductActionBar from '../../../components/ProductActionBar';
+import { useWishlistStore } from '@/store/wishlistStore';
+import { useSnackbar } from 'notistack';
 
 interface ProductDetail {
   id: string;
@@ -33,6 +36,9 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
   const [error, setError] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
 
+  const { addItem: addWishlistItem } = useWishlistStore();
+  const { enqueueSnackbar } = useSnackbar();
+
   useEffect(() => {
     const fetchProduct = async () => {
       if (!slug) return;
@@ -54,6 +60,16 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
   const handleVariantChange = (variant: ProductVariant) => {
     setSelectedVariant(variant);
+  };
+
+  const handleAddToWishlist = async () => {
+    if (!product || !product.id) {
+      enqueueSnackbar('Product not found.', { variant: 'warning' });
+      return;
+    }
+    const host = window.location.hostname; // Get host from client-side
+    await addWishlistItem(host, product.id); // Use product ID
+    enqueueSnackbar('Item added to wishlist!', { variant: 'success' });
   };
 
   if (loading) {
@@ -90,9 +106,18 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           textAlign: 'center', 
           gap: 4 
         }}>
-          <Typography variant="h3" component="h1" fontWeight="bold">
-            {product.title}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Typography variant="h3" component="h1" fontWeight="bold">
+              {product.title}
+            </Typography>
+            <IconButton
+              sx={{ color: 'white' }}
+              onClick={handleAddToWishlist}
+              aria-label="Add to wishlist"
+            >
+              <FavoriteBorderIcon />
+            </IconButton>
+          </Box>
 
           <Box 
             component="img"

@@ -10,18 +10,24 @@ import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { usePathname, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useCartStore } from '@/store/cartStore';
 
 const Header: React.FC = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, isInitialized } = useAuth(); // Get isInitialized
   const [scrolled, setScrolled] = useState(false);
-  const [cartCount] = useState(0); // TODO: Connect to cart state
+  const [mounted, setMounted] = useState(false); // State to track if component has mounted on client
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const pathname = usePathname();
   const router = useRouter();
   const isShopPage = pathname.startsWith('/shop/');
 
+  const { cart, fetchCart, getTotalItems } = useCartStore();
+  const cartCount = getTotalItems();
+
   useEffect(() => {
+    setMounted(true); // Set mounted to true after initial client-side render
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
@@ -29,6 +35,13 @@ const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (mounted && isInitialized) { // Only fetch cart on client after component has mounted and auth is initialized
+      const host = window.location.hostname;
+      fetchCart(host);
+    }
+  }, [fetchCart, mounted, isInitialized]); // Dependency array includes fetchCart, mounted, and isInitialized
 
   return (
     <AppBar
@@ -53,7 +66,7 @@ const Header: React.FC = () => {
         >
           {/* Left Section - Auth Links */}
           <Box sx={{ display: 'flex', gap: isMobile ? 1 : 2, justifyContent: 'flex-start', alignItems: 'center' }}>
-            {isAuthenticated ? (
+            {isInitialized && isAuthenticated ? (
               <Button
                 onClick={logout}
                 sx={{
@@ -177,7 +190,7 @@ const Header: React.FC = () => {
               aria-label="Panier"
             >
               <Badge
-                badgeContent={cartCount}
+                badgeContent={mounted && isInitialized ? cartCount : 0} // Only show cartCount if mounted and auth is initialized
                 sx={{
                   '& .MuiBadge-badge': {
                     backgroundColor: '#fff',

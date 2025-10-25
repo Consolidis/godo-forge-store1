@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Avatar, Tooltip, useTheme, useMediaQuery, IconButton, Snackbar } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Avatar, Tooltip, useTheme, useMediaQuery, IconButton, Snackbar, CircularProgress } from '@mui/material';
 import { AddShoppingCart } from '@mui/icons-material';
+
+import { useCartStore } from '@/store/cartStore';
+import { useSnackbar } from 'notistack';
 
 interface ProductVariant {
   id: string;
@@ -23,6 +26,10 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // New loading state
+
+  const { addItem } = useCartStore();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleVariantClick = (variant: ProductVariant) => {
     onVariantChange(variant);
@@ -39,8 +46,30 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
     setSnackbarOpen(false);
   };
 
+  const handleAddToCart = async () => {
+    if (!selectedVariant || !selectedVariant.id) {
+      enqueueSnackbar('Please select a product variant.', { variant: 'warning' });
+      return;
+    }
+    if (selectedVariant.sellingPrice === null) { // Explicitly check sellingPrice
+      enqueueSnackbar('This product variant is not available for purchase.', { variant: 'warning' });
+      return;
+    }
+
+    setIsLoading(true); // Set loading to true
+    try {
+      const host = window.location.hostname; // Get host from client-side
+      await addItem(host, selectedVariant.id, 1); // Add 1 quantity
+      enqueueSnackbar('Item added to cart!', { variant: 'success' });
+    } catch (error) {
+      enqueueSnackbar('Failed to add item to cart.', { variant: 'error' });
+    } finally {
+      setIsLoading(false); // Set loading to false
+    }
+  };
+
   const displayPrice = selectedVariant?.sellingPrice;
-  const isButtonDisabled = !displayPrice;
+  const isButtonDisabled = !selectedVariant || !selectedVariant.id || selectedVariant.sellingPrice === null || isLoading; // Update disabled state
 
   return (
     <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.9)', backdropFilter: 'blur(10px)' }}>
@@ -89,8 +118,9 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
                 bgcolor: 'grey.400'
               }
             }}
+            onClick={handleAddToCart}
           >
-            <AddShoppingCart />
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : <AddShoppingCart />}
           </IconButton>
         ) : (
           <Button
@@ -98,7 +128,7 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
             color="secondary"
             size="large"
             disabled={isButtonDisabled}
-            startIcon={<AddShoppingCart />}
+            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <AddShoppingCart />}
             sx={{
               ml: 2,
               minWidth: '220px', // Increased width to accommodate price
@@ -112,8 +142,9 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
                 color: 'grey.700'
               }
             }}
+            onClick={handleAddToCart}
           >
-            Ajouter au Panier {displayPrice ? `(${displayPrice.toFixed(2)} $)` : ''}
+            {isLoading ? 'Ajout en cours...' : `Ajouter au Panier ${displayPrice ? `(${displayPrice.toFixed(2)} $)` : ''}`}
           </Button>
         )}
       </Toolbar>
@@ -122,7 +153,7 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
         autoHideDuration={2000}
         onClose={handleCloseSnackbar}
         message={snackbarMessage}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
         sx={{ bottom: { xs: 90, sm: 90 } }} // Position above the action bar
       />
     </AppBar>

@@ -3,7 +3,8 @@ import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { AuthProvider } from "../providers/AuthProvider";
-import ClientAuthInitializer from "../components/ClientAuthInitializer";
+
+import SnackbarProviderWrapper from "../components/SnackbarProviderWrapper";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 
 export const metadata: Metadata = {
@@ -19,13 +20,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="pt-20">
-        <AuthProvider>
-          <ClientAuthInitializer />
+        <SnackbarProviderWrapper>
+          <AuthProvider>
+
           <Header />
           {children}
           <Footer />
           <ScrollToTopButton />
         </AuthProvider>
+        </SnackbarProviderWrapper>
       </body>
     </html>
   );

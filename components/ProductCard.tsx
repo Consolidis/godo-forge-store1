@@ -3,10 +3,14 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardMedia, Typography, Button, Box, CardActions } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Button, Box, CardActions, IconButton, CircularProgress } from '@mui/material';
 import { AddShoppingCart } from '@mui/icons-material';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 import { ProductVariant } from '@/types';
+import { useCartStore } from '@/store/cartStore';
+import { useWishlistStore } from '@/store/wishlistStore';
+import { useSnackbar } from 'notistack';
 
 interface ProductCardProps {
   id: string;
@@ -27,11 +31,56 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // New loading state
+
+  const { addItem: addCartItem } = useCartStore();
+  const { addItem: addWishlistItem } = useWishlistStore();
+  const { enqueueSnackbar } = useSnackbar();
 
   const displayVariants = variants.slice(0, 3);
   const currentVariant = variants[selectedVariant] || variants[0];
   const displayPrice = currentVariant?.sellingPrice || currentVariant?.price || price;
-  const displayImage = currentVariant?.image || image;
+  const displayImage = currentVariant?.image || 'https://via.placeholder.com/400x400/0a0a0a/FFFFFF?text=Waltech';
+
+  const handleAddToCart = async () => {
+    if (!currentVariant || !currentVariant.id) {
+      enqueueSnackbar('Please select a product variant.', { variant: 'warning' });
+      return;
+    }
+    if (currentVariant.sellingPrice === null) { // Explicitly check sellingPrice
+      enqueueSnackbar('This product variant is not available for purchase.', { variant: 'warning' });
+      return;
+    }
+
+    setIsLoading(true); // Set loading to true
+    try {
+      const host = window.location.hostname; // Get host from client-side
+      await addCartItem(host, currentVariant.id, 1); // Add 1 quantity
+      enqueueSnackbar('Item added to cart!', { variant: 'success' });
+    } catch (error) {
+      enqueueSnackbar('Failed to add item to cart.', { variant: 'error' });
+    } finally {
+      setIsLoading(false); // Set loading to false
+    }
+  };
+
+  const handleAddToWishlist = async (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setIsLoading(true); // Set loading to true for wishlist as well
+    try {
+      const host = window.location.hostname; // Get host from client-side
+      await addWishlistItem(host, id); // Use product ID
+      enqueueSnackbar('Item added to wishlist!', { variant: 'success' });
+    } catch (error) {
+      enqueueSnackbar('Failed to add item to wishlist.', { variant: 'error' });
+    } finally {
+      setIsLoading(false); // Set loading to false
+    }
+  };
+
+  const isButtonDisabled = !currentVariant || !currentVariant.id || currentVariant.sellingPrice === null || isLoading; // Update disabled state
 
   return (
     <motion.div
@@ -54,7 +103,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <Link href={`/shop/${slug}`} passHref>
               <CardMedia
                 component="img"
-                image={displayImage || 'https://via.placeholder.com/400x400/0a0a0a/FFFFFF?text=Waltech'}
+                image={displayImage}
                 alt={title}
                 sx={{
                   width: '100%',
@@ -74,6 +123,27 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 }}
               />
           </Link>
+          {/* Wishlist Button */}
+          <IconButton
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              color: 'white',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              '&:hover': {
+                backgroundColor: 'rgba(0,0,0,0.7)',
+              },
+              opacity: isHovered ? 1 : 0,
+              transition: 'opacity 0.3s ease-in-out',
+              zIndex: 1, // Ensure it's above the overlay
+            }}
+            onClick={handleAddToWishlist}
+            aria-label="Add to wishlist"
+            disabled={isLoading} // Disable wishlist button during loading
+          >
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : <FavoriteBorderIcon />}
+          </IconButton>
         </Box>
 
         <CardContent sx={{ pb: 0 }}>
@@ -136,7 +206,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             fullWidth
             variant="contained"
             color="primary"
-            startIcon={<AddShoppingCart />}
+            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <AddShoppingCart />}
             sx={{ 
               py: 1.5, 
               borderRadius: '0.75rem',
@@ -145,8 +215,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 backgroundColor: 'grey.800'
               }
             }}
+            onClick={handleAddToCart}
+            disabled={isButtonDisabled}
           >
-            Ajouter au Panier
+            {isLoading ? 'Ajout en cours...' : 'Ajouter au Panier'}
           </Button>
         </CardActions>
       </Card>

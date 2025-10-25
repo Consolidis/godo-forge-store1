@@ -31,3 +31,20 @@ export interface Category {
   slug: string;
   products: Product[];
 }
+
+export interface WishlistItem {
+  id: string;
+  product: Product; // Assuming Product interface is correct
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface Wishlist {
+  id: string;
+  shopId: string; // Assuming shop ID is exposed
+  customerId: string | null; // Nullable for guest wishlists
+  guestToken: string | null; // Nullable for authenticated wishlists
+  items: WishlistItem[];
+  createdAt: string;
+  updatedAt: string | null;
+}

@@ -40,10 +40,12 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     let token = null;
+    let guestWishlistToken = null;
     // This code will only run on the client-side, where `window` is defined
     if (typeof window !== 'undefined') {
       config.headers['X-Shop-Domain'] = window.location.hostname;
       token = localStorage.getItem('jwt_token');
+      guestWishlistToken = localStorage.getItem('guest_wishlist_token'); // Get guest wishlist token
     }
 
     // For server-side requests, the X-Shop-Domain header should be passed in the request config.
@@ -53,6 +55,11 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     } else if (API_KEY) {
       config.headers.Authorization = `Bearer ${API_KEY}`;
+    }
+
+    // Add X-Guest-Wishlist-Token if available
+    if (guestWishlistToken) {
+      config.headers['X-Guest-Wishlist-Token'] = guestWishlistToken;
     }
 
     return config;

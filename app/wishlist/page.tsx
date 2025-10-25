@@ -8,11 +8,13 @@ import Link from 'next/link';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useCartStore } from '@/store/cartStore'; // To move items to cart
 import { useSnackbar } from 'notistack';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 export default function WishlistPage() {
-  const { wishlist, loading, error, fetchWishlist, removeItem } = useWishlistStore();
+  const { wishlist, loading, error, fetchWishlist, removeItem, moveToCart } = useWishlistStore(); // Add moveToCart
   const { addItem: addCartItem } = useCartStore(); // Renamed to avoid conflict
   const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter(); // Initialize useRouter
 
   useEffect(() => {
     const host = window.location.hostname;
@@ -25,21 +27,13 @@ export default function WishlistPage() {
     enqueueSnackbar('Item removed from wishlist!', { variant: 'info' });
   };
 
-  const handleMoveToCart = async (productId: string) => {
-    // This assumes a default variant for the product.
-    // In a real app, you might want to redirect to product page to select variant.
-    // For now, we'll assume the first variant if available, or handle error.
+  const handleMoveToCart = async (wishlistItemId: string) => { // Change parameter name to wishlistItemId
     const host = window.location.hostname;
-    // This is a simplified approach. Ideally, the API would have a dedicated endpoint
-    // to move a wishlist item to cart, handling variant selection if necessary.
-    // For now, we'll just add the product's first variant to the cart.
-    // This requires fetching product details to get a variant ID.
-    // For simplicity, let's assume the product object in wishlist item has a default variant ID or we can fetch it.
-    // For now, we'll just add the product ID to the cart, which is not correct.
-    // The API expects productVariantId.
-    // I will leave this part commented out for now, as it requires more logic.
-    // await addCartItem(host, productId, 1);
-    enqueueSnackbar('Moving to cart is not yet fully implemented.', { variant: 'warning' });
+    await moveToCart(host, wishlistItemId); // Call moveToCart from store
+    enqueueSnackbar('Item moved to cart!', { variant: 'success' });
+    // Optionally, you might want to trigger a cart fetch here if the cart store is separate
+    useCartStore.getState().fetchCart(host); // Fetch cart to update badge
+    router.push('/cart'); // Redirect to cart page
   };
 
   if (loading) {
@@ -58,7 +52,7 @@ export default function WishlistPage() {
     );
   }
 
-  if (!wishlist || wishlist.items.length === 0) {
+  if (!wishlist || !Array.isArray(wishlist.items) || wishlist.items.length === 0) {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center', bgcolor: 'black', color: 'white', minHeight: '100vh' }}>
         <Typography variant="h4" component="h1" gutterBottom>
@@ -103,7 +97,7 @@ export default function WishlistPage() {
                   variant="contained"
                   color="primary"
                   startIcon={<ShoppingCart />}
-                  onClick={() => handleMoveToCart(item.product.id)}
+                  onClick={() => handleMoveToCart(item.id)} // Pass item.id
                   sx={{ bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}
                 >
                   Ajouter au Panier

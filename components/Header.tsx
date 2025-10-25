@@ -11,6 +11,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { usePathname, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCartStore } from '@/store/cartStore';
+import { useWishlistStore } from '@/store/wishlistStore'; // Import useWishlistStore
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout, isInitialized } = useAuth(); // Get isInitialized
@@ -24,6 +25,9 @@ const Header: React.FC = () => {
 
   const { cart, fetchCart, getTotalItems } = useCartStore();
   const cartCount = getTotalItems();
+
+  const { wishlist, fetchWishlist, getTotalItems: getWishlistTotalItems } = useWishlistStore(); // Get wishlist store
+  const wishlistCount = getWishlistTotalItems(); // Get wishlist item count
 
   useEffect(() => {
     setMounted(true); // Set mounted to true after initial client-side render
@@ -40,8 +44,9 @@ const Header: React.FC = () => {
     if (mounted && isInitialized) { // Only fetch cart on client after component has mounted and auth is initialized
       const host = window.location.hostname;
       fetchCart(host);
+      fetchWishlist(host); // Fetch wishlist as well
     }
-  }, [fetchCart, mounted, isInitialized]); // Dependency array includes fetchCart, mounted, and isInitialized
+  }, [fetchCart, fetchWishlist, mounted, isInitialized]); // Dependency array includes fetchCart, fetchWishlist, mounted, and isInitialized
 
   return (
     <AppBar
@@ -174,7 +179,18 @@ const Header: React.FC = () => {
               }}
               aria-label="Liste de souhaits"
             >
-              <FavoriteIcon />
+              <Badge
+                badgeContent={mounted && isInitialized ? wishlistCount : 0} // Apply badge to wishlist
+                sx={{
+                  '& .MuiBadge-badge': {
+                    backgroundColor: '#fff',
+                    color: '#000',
+                    fontWeight: 600,
+                  },
+                }}
+              >
+                <FavoriteIcon />
+              </Badge>
             </IconButton>
 
             <IconButton

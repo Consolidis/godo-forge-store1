@@ -84,25 +84,25 @@ const CheckoutPage = () => {
                         </Typography>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="firstName" label="Prénom" fullWidth autoComplete="given-name" onChange={handleInputChange} />
+                                <TextField required name="firstName" label="Prénom" fullWidth autoComplete="given-name" value={shippingAddress.firstName} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="lastName" label="Nom" fullWidth autoComplete="family-name" onChange={handleInputChange} />
+                                <TextField required name="lastName" label="Nom" fullWidth autoComplete="family-name" value={shippingAddress.lastName} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField required name="street" label="Adresse" fullWidth autoComplete="shipping address-line1" onChange={handleInputChange} />
+                                <TextField required name="street" label="Adresse" fullWidth autoComplete="shipping address-line1" value={shippingAddress.street} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="city" label="Ville" fullWidth autoComplete="shipping address-level2" onChange={handleInputChange} />
+                                <TextField required name="city" label="Ville" fullWidth autoComplete="shipping address-level2" value={shippingAddress.city} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="postalCode" label="Code Postal" fullWidth autoComplete="shipping postal-code" onChange={handleInputChange} />
+                                <TextField required name="postalCode" label="Code Postal" fullWidth autoComplete="shipping postal-code" value={shippingAddress.postalCode} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="country" label="Pays" fullWidth autoComplete="shipping country" onChange={handleInputChange} />
+                                <TextField required name="country" label="Pays" fullWidth autoComplete="shipping country" value={shippingAddress.country} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="phone" label="Téléphone" fullWidth autoComplete="tel" onChange={handleInputChange} />
+                                <TextField required name="phone" label="Téléphone" fullWidth autoComplete="tel" value={shippingAddress.phone} onChange={handleInputChange} />
                             </Grid>
                         </Grid>
                     </Paper>

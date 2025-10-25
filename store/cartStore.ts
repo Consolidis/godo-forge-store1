@@ -58,75 +58,71 @@ export const useCartStore = create<CartState>((set, get) => ({
 
       }
 
-      const response = await api.get('/public/api/v1/cart', { headers });
+            const response = await api.get('/public/api/v1/cart', { headers });
 
-      const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+            const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
 
-      console.log('Cart after fetch:', data); // Debug log
+            set({ cart: data, loading: false });
 
-      set({ cart: data, loading: false });
+            if (data.guestToken) {
 
-      if (data.guestToken) {
+              localStorage.setItem('guest_cart_token', data.guestToken);
 
-        localStorage.setItem('guest_cart_token', data.guestToken);
+            } else {
 
-      } else {
+              localStorage.removeItem('guest_cart_token'); // Clear if no guest token returned
 
-        localStorage.removeItem('guest_cart_token'); // Clear if no guest token returned
+            }
 
-      }
+          } catch (error: any) {
 
-    } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to fetch cart', loading: false });
 
-      set({ error: error.response?.data?.message || 'Failed to fetch cart', loading: false });
+          }
 
-    }
+        },
 
-  },
+      
 
+        addItem: async (host: string, productVariantId: string, quantity: number) => {
 
+          set({ loading: true, error: null });
 
-  addItem: async (host: string, productVariantId: string, quantity: number) => {
+          try {
 
-    set({ loading: true, error: null });
+            const guestToken = localStorage.getItem('guest_cart_token'); // Get guest token from localStorage
 
-    try {
+            const headers: Record<string, string> = { 'X-Shop-Domain': host };
 
-      const guestToken = localStorage.getItem('guest_cart_token'); // Get guest token from localStorage
+            if (guestToken) {
 
-      const headers: Record<string, string> = { 'X-Shop-Domain': host };
+              headers['X-Guest-Cart-Token'] = guestToken; // Send guest token to API
 
-      if (guestToken) {
+            }
 
-        headers['X-Guest-Cart-Token'] = guestToken; // Send guest token to API
+            const response = await api.post('/public/api/v1/cart/items', { productVariantId, quantity }, { headers });
 
-      }
+            const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
 
-      const response = await api.post('/public/api/v1/cart/items', { productVariantId, quantity }, { headers });
+            set({ cart: data, loading: false });
 
-      const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+            if (data.guestToken) {
 
-      console.log('Cart after add:', data); // Debug log
+              localStorage.setItem('guest_cart_token', data.guestToken);
 
-      set({ cart: data, loading: false });
+            } else {
 
-      if (data.guestToken) {
+              localStorage.removeItem('guest_cart_token');
 
-        localStorage.setItem('guest_cart_token', data.guestToken);
+            }
 
-      } else {
+          } catch (error: any) {
 
-        localStorage.removeItem('guest_cart_token');
+            set({ error: error.response?.data?.message || 'Failed to add item to cart', loading: false });
 
-      }
+          }
 
-    } catch (error: any) {
-
-      set({ error: error.response?.data?.message || 'Failed to add item to cart', loading: false });
-
-    }
-
-  },
+        },
 
 
 

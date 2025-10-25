@@ -39,22 +39,35 @@ const api = axios.create({
 // Interceptor to add API Key and Host header for all requests
 api.interceptors.request.use(
   (config) => {
-    let token = null;
+    let customerJwtToken = null;
     let guestWishlistToken = null;
+    let shopApiKey = API_KEY; // Get the shop API key from .env
+
     // This code will only run on the client-side, where `window` is defined
     if (typeof window !== 'undefined') {
       config.headers['X-Shop-Domain'] = window.location.hostname;
-      token = localStorage.getItem('jwt_token');
-      guestWishlistToken = localStorage.getItem('guest_wishlist_token'); // Get guest wishlist token
+      customerJwtToken = localStorage.getItem('jwt_token'); // This is the customer's JWT
+      guestWishlistToken = localStorage.getItem('guest_wishlist_token');
     }
 
-    // For server-side requests, the X-Shop-Domain header should be passed in the request config.
-    
-    // Use JWT token if it was found, otherwise fall back to the API Key
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else if (API_KEY) {
-      config.headers.Authorization = `Bearer ${API_KEY}`;
+    // Determine which Authorization header to send
+    // If the URL starts with /api/v1/customer, use the customer's JWT
+    // Otherwise, use the shop's API key
+    if (config.url?.startsWith('/api/v1/customer')) { // Check if it's a customer-specific route
+      if (customerJwtToken) {
+        config.headers.Authorization = `Bearer ${customerJwtToken}`;
+      } else {
+        // If it's a customer route but no JWT, it means the user is not logged in.
+        // The backend will handle 401 if authentication is required for this route.
+        // Do not send shop API key here.
+        delete config.headers.Authorization; // Ensure no old auth header is sent
+      }
+    } else { // For all other routes (public shop routes)
+      if (shopApiKey) {
+        config.headers.Authorization = `Bearer ${shopApiKey}`;
+      } else {
+        delete config.headers.Authorization; // Ensure no old auth header is sent
+      }
     }
 
     // Add X-Guest-Wishlist-Token if available

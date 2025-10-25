@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import api from '../../lib/api';
+import { Box, Button, Container, TextField, Typography, Link as MuiLink, CircularProgress } from '@mui/material'; // Import MUI components
+import Link from 'next/link'; // Import Next.js Link
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,15 +17,29 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      const headers: Record<string, string> = {};
+      const guestCartToken = localStorage.getItem('guest_cart_token');
+      const guestWishlistToken = localStorage.getItem('guest_wishlist_token');
+
+      if (guestCartToken) {
+        headers['X-Guest-Cart-Token'] = guestCartToken;
+      }
+      if (guestWishlistToken) {
+        headers['X-Guest-Wishlist-Token'] = guestWishlistToken;
+      }
+
       const response = await api.post('/public/customer/login', {
         email,
         password,
-      });
+      }, { headers });
 
       const { token } = response.data;
-      localStorage.setItem('jwt_token', token); // Store JWT token
-      // Redirect to a protected page or home
-      window.location.href = '/'; // Simple redirect for now
+      localStorage.setItem('jwt_token', token);
+
+      localStorage.removeItem('guest_cart_token');
+      localStorage.removeItem('guest_wishlist_token');
+
+      window.location.href = '/';
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -32,66 +48,111 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 p-10 bg-gray-900 rounded-xl shadow-lg">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            Connectez-vous à votre compte
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email-address" className="sr-only">Adresse e-mail</label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Adresse e-mail"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Mot de passe</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm mt-2"
-                placeholder="Mot de passe"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              {loading ? 'Connexion...' : 'Se connecter'}
-            </button>
-          </div>
-        </form>
-        <div className="text-sm text-center">
-          <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-            Mot de passe oublié ?
-          </a>
-        </div>
-        <div className="text-sm text-center">
-          <p className="text-gray-400">Pas encore de compte ? <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">S'inscrire</a></p>
-        </div>
-      </div>
-    </div>
+    <Container component="main" maxWidth="xs" sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      bgcolor: 'black',
+      py: 4,
+    }}>
+      <Box
+        sx={{
+          p: { xs: 3, sm: 5 },
+          borderRadius: '12px',
+          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.5)',
+          bgcolor: 'grey.900',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Typography component="h1" variant="h4" sx={{ mb: 3, color: 'white', fontWeight: 'bold' }}>
+          Connectez-vous
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Adresse e-mail"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': { borderColor: 'grey.700' },
+                '&:hover fieldset': { borderColor: 'grey.500' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+              '& .MuiInputLabel-root': { color: 'grey.400' },
+              '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+            }}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Mot de passe"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            variant="outlined"
+            sx={{
+              mt: 2, // Add margin top for spacing
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': { borderColor: 'grey.700' },
+                '&:hover fieldset': { borderColor: 'grey.500' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+              '& .MuiInputLabel-root': { color: 'grey.400' },
+              '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+            }}
+          />
+          {error && (
+            <Typography color="error" variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+              {error}
+            </Typography>
+          )}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{
+              mt: 3,
+              mb: 2,
+              py: 1.5,
+              bgcolor: 'primary.main',
+              color: 'black',
+              fontWeight: 'bold',
+              '&:hover': { bgcolor: 'primary.dark' },
+            }}
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+          >
+            {loading ? 'Connexion...' : 'Se connecter'}
+          </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2 }}>
+            <MuiLink component={Link} href="#" variant="body2" sx={{ color: 'primary.light', textDecoration: 'none' }}>
+              Mot de passe oublié ?
+            </MuiLink>
+            <MuiLink component={Link} href="/register" variant="body2" sx={{ color: 'primary.light', textDecoration: 'none' }}>
+              Pas encore de compte ? S'inscrire
+            </MuiLink>
+          </Box>
+        </Box>
+      </Box>
+    </Container>
   );
 }

@@ -1,7 +1,11 @@
 "use client";
 
+"use client";
+
 import React, { useState } from 'react';
 import api from '../../lib/api';
+import { Box, Button, Container, TextField, Typography, Link as MuiLink, CircularProgress } from '@mui/material'; // Import MUI components
+import Link from 'next/link'; // Import Next.js Link
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -19,16 +23,35 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // Assuming the registration endpoint is /public/customer/register
-      // The backend should handle sending a confirmation email if required.
-      await api.post('/public/customer/register', {
+      const headers: Record<string, string> = {};
+      const guestCartToken = localStorage.getItem('guest_cart_token');
+      const guestWishlistToken = localStorage.getItem('guest_wishlist_token');
+
+      if (guestCartToken) {
+        headers['X-Guest-Cart-Token'] = guestCartToken;
+      }
+      if (guestWishlistToken) {
+        headers['X-Guest-Wishlist-Token'] = guestWishlistToken;
+      }
+
+      const response = await api.post('/public/customer/register', {
         email,
         password,
         firstName,
         lastName,
-      });
+      }, { headers });
 
-      setSuccess('Registration successful! Please check your email to confirm your account.');
+      const { token } = response.data;
+      if (token) {
+        localStorage.setItem('jwt_token', token);
+        localStorage.removeItem('guest_cart_token');
+        localStorage.removeItem('guest_wishlist_token');
+        setSuccess('Registration successful! You are now logged in.');
+        window.location.href = '/';
+      } else {
+        setSuccess('Registration successful! Please check your email to confirm your account.');
+      }
+
       setEmail('');
       setPassword('');
       setFirstName('');
@@ -41,90 +64,159 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 p-10 bg-gray-900 rounded-xl shadow-lg">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            Créez votre compte
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div className="mb-4">
-              <label htmlFor="first-name" className="sr-only">Prénom</label>
-              <input
-                id="first-name"
-                name="firstName"
-                type="text"
-                autoComplete="given-name"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Prénom"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="last-name" className="sr-only">Nom</label>
-              <input
-                id="last-name"
-                name="lastName"
-                type="text"
-                autoComplete="family-name"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Nom"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="email-address" className="sr-only">Adresse e-mail</label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Adresse e-mail"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Mot de passe</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-white bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Mot de passe"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-          {success && <p className="text-green-500 text-sm text-center">{success}</p>}
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              {loading ? 'Inscription...' : "S'inscrire"}
-            </button>
-          </div>
-        </form>
-        <div className="text-sm text-center">
-          <p className="text-gray-400">Déjà un compte ? <a href="/login" className="font-medium text-blue-600 hover:text-blue-500">Se connecter</a></p>
-        </div>
-      </div>
-    </div>
+    <Container component="main" maxWidth="xs" sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      bgcolor: 'black',
+      py: 4,
+    }}>
+      <Box
+        sx={{
+          p: { xs: 3, sm: 5 },
+          borderRadius: '12px',
+          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.5)',
+          bgcolor: 'grey.900',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Typography component="h1" variant="h4" sx={{ mb: 3, color: 'white', fontWeight: 'bold' }}>
+          Créez votre compte
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="first-name"
+            label="Prénom"
+            name="firstName"
+            autoComplete="given-name"
+            autoFocus
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': { borderColor: 'grey.700' },
+                '&:hover fieldset': { borderColor: 'grey.500' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+              '& .MuiInputLabel-root': { color: 'grey.400' },
+              '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+            }}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="last-name"
+            label="Nom"
+            name="lastName"
+            autoComplete="family-name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            variant="outlined"
+            sx={{
+              mt: 2,
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': { borderColor: 'grey.700' },
+                '&:hover fieldset': { borderColor: 'grey.500' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+              '& .MuiInputLabel-root': { color: 'grey.400' },
+              '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+            }}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Adresse e-mail"
+            name="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            variant="outlined"
+            sx={{
+              mt: 2,
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': { borderColor: 'grey.700' },
+                '&:hover fieldset': { borderColor: 'grey.500' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+              '& .MuiInputLabel-root': { color: 'grey.400' },
+              '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+            }}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Mot de passe"
+            type="password"
+            id="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            variant="outlined"
+            sx={{
+              mt: 2,
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': { borderColor: 'grey.700' },
+                '&:hover fieldset': { borderColor: 'grey.500' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+              '& .MuiInputLabel-root': { color: 'grey.400' },
+              '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+            }}
+          />
+          {error && (
+            <Typography color="error" variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+              {error}
+            </Typography>
+          )}
+          {success && (
+            <Typography color="success.main" variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+              {success}
+            </Typography>
+          )}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{
+              mt: 3,
+              mb: 2,
+              py: 1.5,
+              bgcolor: 'primary.main',
+              color: 'black',
+              fontWeight: 'bold',
+              '&:hover': { bgcolor: 'primary.dark' },
+            }}
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+          >
+            {loading ? 'Inscription...' : "S'inscrire"}
+          </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 2 }}>
+            <MuiLink component={Link} href="/login" variant="body2" sx={{ color: 'primary.light', textDecoration: 'none' }}>
+              Déjà un compte ? Se connecter
+            </MuiLink>
+          </Box>
+        </Box>
+      </Box>
+    </Container>
   );
 }

@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardMedia, Typography, Button, Box, CardActions, IconButton, CircularProgress } from '@mui/material';
 import { AddShoppingCart } from '@mui/icons-material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite'; // Import filled heart icon
+import { useMediaQuery, useTheme } from '@mui/material'; // Import useMediaQuery and useTheme
 
 import { ProductVariant } from '@/types';
 import { useCartStore } from '@/store/cartStore';
@@ -34,13 +36,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [isLoading, setIsLoading] = useState(false); // New loading state
 
   const { addItem: addCartItem } = useCartStore();
-  const { addItem: addWishlistItem } = useWishlistStore();
+  const { addItem: addWishlistItem, wishlist } = useWishlistStore(); // Get wishlist state
   const { enqueueSnackbar } = useSnackbar();
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const displayVariants = variants.slice(0, 3);
   const currentVariant = variants[selectedVariant] || variants[0];
   const displayPrice = currentVariant?.sellingPrice || currentVariant?.price || price;
   const displayImage = currentVariant?.image || 'https://via.placeholder.com/400x400/0a0a0a/FFFFFF?text=Waltech';
+
+  const isInWishlist = wishlist?.items?.some(item => item.product.id === id); // Check if product is in wishlist
 
   const handleAddToCart = async () => {
     if (!currentVariant || !currentVariant.id) {
@@ -129,12 +136,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
               position: 'absolute',
               top: 8,
               right: 8,
-              color: 'white',
+              color: isInWishlist ? 'red' : 'white', // Change color based on isInWishlist
               backgroundColor: 'rgba(0,0,0,0.5)',
               '&:hover': {
                 backgroundColor: 'rgba(0,0,0,0.7)',
               },
-              opacity: isHovered ? 1 : 0,
+              opacity: isMobile ? 1 : (isHovered ? 1 : 0), // Always visible on mobile
               transition: 'opacity 0.3s ease-in-out',
               zIndex: 1, // Ensure it's above the overlay
             }}
@@ -142,7 +149,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             aria-label="Add to wishlist"
             disabled={isLoading} // Disable wishlist button during loading
           >
-            {isLoading ? <CircularProgress size={24} color="inherit" /> : <FavoriteBorderIcon />}
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : (isInWishlist ? <FavoriteIcon /> : <FavoriteBorderIcon />)}
           </IconButton>
         </Box>
 

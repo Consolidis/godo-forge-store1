@@ -2,16 +2,22 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress, Box } from '@mui/material';
+import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress, Box, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel } from '@mui/material';
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
+
+const SHIPPING_COSTS = {
+    standard: 5,
+    express: 30,
+};
 
 const CheckoutPage = () => {
     const router = useRouter();
     const { cart, totalItems, totalPrice } = useCartStore();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [shippingMethod, setShippingMethod] = useState('standard');
     const [shippingAddress, setShippingAddress] = useState({
         firstName: '',
         lastName: '',
@@ -27,14 +33,27 @@ const CheckoutPage = () => {
         setShippingAddress(prevState => ({ ...prevState, [name]: value }));
     };
 
+    const handleShippingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setShippingMethod(event.target.value);
+    };
+
     const handleCheckout = async () => {
         setLoading(true);
         setError('');
 
         try {
+            const guestToken = localStorage.getItem('guest_cart_token');
+            const headers: Record<string, string> = {};
+            if (guestToken) {
+                headers['X-Guest-Cart-Token'] = guestToken;
+            }
+            // Add X-Shop-Domain header
+            headers['X-Shop-Domain'] = window.location.hostname;
+
             const response = await api.post('/public/api/v1/checkout', {
                 shipping_address: shippingAddress,
-            });
+                shipping_method: shippingMethod,
+            }, { headers });
 
             if (response.status === 201) {
                 const order = response.data;
@@ -49,6 +68,9 @@ const CheckoutPage = () => {
         setLoading(false);
     };
 
+    const shippingCost = SHIPPING_COSTS[shippingMethod as keyof typeof SHIPPING_COSTS];
+    const finalTotal = totalPrice + shippingCost;
+
     return (
         <Container sx={{ mt: 12, mb: 8 }}>
             <Typography variant="h4" component="h1" gutterBottom align="center">
@@ -56,7 +78,7 @@ const CheckoutPage = () => {
             </Typography>
             <Grid container spacing={4}>
                 <Grid item xs={12} md={7}>
-                    <Paper sx={{ p: 3 }}>
+                    <Paper sx={{ p: 3, mb: 3 }}>
                         <Typography variant="h6" gutterBottom>
                             Adresse de livraison
                         </Typography>
@@ -83,6 +105,20 @@ const CheckoutPage = () => {
                                 <TextField required name="phone" label="Téléphone" fullWidth autoComplete="tel" onChange={handleInputChange} />
                             </Grid>
                         </Grid>
+                    </Paper>
+                    <Paper sx={{ p: 3 }}>
+                        <FormControl component="fieldset">
+                            <FormLabel component="legend">Méthode d'expédition</FormLabel>
+                            <RadioGroup
+                                aria-label="shipping method"
+                                name="shippingMethod"
+                                value={shippingMethod}
+                                onChange={handleShippingChange}
+                            >
+                                <FormControlLabel value="standard" control={<Radio />} label={`Standard - 5.00 $`} />
+                                <FormControlLabel value="express" control={<Radio />} label={`Express - 30.00 $`} />
+                            </RadioGroup>
+                        </FormControl>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} md={5}>
@@ -111,7 +147,9 @@ const CheckoutPage = () => {
                         </Typography>
                         <Box sx={{ mb: 2 }}>
                             <Typography>Total Articles: {totalItems}</Typography>
-                            <Typography variant="h6">Total: {(totalPrice || 0).toFixed(2)} $</Typography>
+                            <Typography>Sous-total: {totalPrice.toFixed(2)} $</Typography>
+                            <Typography>Livraison: {shippingCost.toFixed(2)} $</Typography>
+                            <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold' }}>Total: {finalTotal.toFixed(2)} $</Typography>
                         </Box>
                         {cart?.items?.map(item => (
                             <Box key={item.id} sx={{ display: 'flex', mb: 2, alignItems: 'center' }}>

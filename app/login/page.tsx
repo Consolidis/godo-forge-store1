@@ -35,7 +35,7 @@ export default function LoginPage() {
         password,
       }, { headers });
 
-      const { token, cart, wishlist } = response.data; // Extract cart and wishlist from response
+      const { token, cart = null, wishlist = null } = response.data; // Provide default null values
       localStorage.setItem('jwt_token', token);
 
       localStorage.removeItem('guest_cart_token');

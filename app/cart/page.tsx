@@ -9,7 +9,7 @@ import { useCartStore } from '@/store/cartStore';
 import { useSnackbar } from 'notistack';
 
 export default function CartPage() {
-  const { cart, loading, error, fetchCart, updateItemQuantity, removeItem, clearCart, getTotalPrice } = useCartStore();
+  const { cart, loading, error, fetchCart, updateItemQuantity, removeItem, clearCart, totalPrice } = useCartStore();
   const { enqueueSnackbar } = useSnackbar();
   const [mounted, setMounted] = useState(false); // State to track if component has mounted on client
 
@@ -22,7 +22,7 @@ export default function CartPage() {
       const host = window.location.hostname;
       fetchCart(host);
     }
-  }, [fetchCart, mounted]); // Dependency array includes fetchCart and mounted
+  }, [mounted]); // Dependency array includes fetchCart and mounted
 
   const handleUpdateQuantity = async (itemId: string, currentQuantity: number, delta: number) => {
     const newQuantity = currentQuantity + delta;
@@ -92,7 +92,7 @@ export default function CartPage() {
               <Box sx={{ width: 100, height: 100, position: 'relative', mr: 2 }}>
                 <Image
                   src={item.productVariant.image || '/placeholder.png'}
-                  alt={item.productVariant.name || item.productVariant.sku}
+                  alt={item.productVariant.name || item.productVariant.sku || 'Image du produit'}
                   layout="fill"
                   objectFit="cover"
                   priority
@@ -128,7 +128,7 @@ export default function CartPage() {
             <Typography variant="h5" gutterBottom>Résumé de la commande</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography>Sous-total:</Typography>
-              <Typography>{getTotalPrice().toFixed(2)} $</Typography>
+              <Typography>{totalPrice.toFixed(2)} $</Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
               <Typography>Livraison:</Typography>
@@ -136,7 +136,7 @@ export default function CartPage() {
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid grey.700', pt: 2 }}>
               <Typography variant="h6">Total:</Typography>
-              <Typography variant="h6">{getTotalPrice().toFixed(2)} $</Typography>
+              <Typography variant="h6">{totalPrice.toFixed(2)} $</Typography>
             </Box>
             <Button component={Link} href="/checkout" variant="contained" fullWidth sx={{ mt: 3, bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
               Passer à la caisse

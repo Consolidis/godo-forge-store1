@@ -41,12 +41,14 @@ export default function RegisterPage() {
         lastName,
       }, { headers });
 
-      const { token, cart, wishlist } = response.data; // Extract cart and wishlist from response
+      console.log('Registration API response:', response.data); // Debug log
+
+      const { token, cart = null, wishlist = null } = response.data; // Extract cart and wishlist from response
       if (token) {
+        console.log('Token received, proceeding with login logic.'); // Debug log
         localStorage.setItem('jwt_token', token);
         localStorage.removeItem('guest_cart_token');
         localStorage.removeItem('guest_wishlist_token');
-        setSuccess('Registration successful! You are now logged in.');
 
         // Update Zustand stores directly
         if (cart) {
@@ -66,8 +68,12 @@ export default function RegisterPage() {
           }
         }
 
-        window.location.href = '/';
+        setSuccess('Registration successful! You are now logged in.');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
       } else {
+        console.log('No token received, assuming email confirmation needed.'); // Debug log
         setSuccess('Registration successful! Please check your email to confirm your account.');
       }
 
@@ -76,7 +82,9 @@ export default function RegisterPage() {
       setFirstName('');
       setLastName('');
     } catch (err: any) {
+      console.error('Registration API error:', err.response?.data || err); // Debug log
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setSuccess(null); // Ensure success message is cleared on error
     } finally {
       setLoading(false);
     }

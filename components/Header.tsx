@@ -23,11 +23,8 @@ const Header: React.FC = () => {
   const router = useRouter();
   const isShopPage = pathname.startsWith('/shop/');
 
-  const { cart, fetchCart, getTotalItems } = useCartStore();
-  const cartCount = getTotalItems();
-
-  const { wishlist, fetchWishlist, getTotalItems: getWishlistTotalItems } = useWishlistStore(); // Get wishlist store
-  const wishlistCount = getWishlistTotalItems(); // Get wishlist item count
+  const { fetchCart, totalItems: cartCount } = useCartStore();
+  const { fetchWishlist, totalItems: wishlistCount } = useWishlistStore();
 
   useEffect(() => {
     setMounted(true); // Set mounted to true after initial client-side render

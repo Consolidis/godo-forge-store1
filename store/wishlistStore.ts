@@ -1,24 +1,34 @@
 import { create } from 'zustand';
 import api from '@/lib/api';
-import { Wishlist, WishlistItem, Product } from '@/types';
+import { Wishlist } from '@/types';
+import { useCartStore } from './cartStore';
 
 interface WishlistState {
   wishlist: Wishlist | null;
   loading: boolean;
   error: string | null;
+  totalItems: number;
   fetchWishlist: (host: string) => Promise<void>;
   addItem: (host: string, productId: string) => Promise<void>;
   removeItem: (host: string, itemId: string) => Promise<void>;
-  moveToCart: (host: string, itemId: string) => Promise<void>; // New function
-  getTotalItems: () => number;
+  moveToCart: (host: string, itemId: string) => Promise<void>;
+  setWishlist: (wishlist: Wishlist | null) => void;
 }
 
 const GUEST_WISHLIST_TOKEN_KEY = 'guest_wishlist_token';
+
+const updateTotals = (wishlist: Wishlist | null) => {
+  if (!wishlist || !wishlist.wishlistItems) {
+    return { totalItems: 0 };
+  }
+  return { totalItems: wishlist.wishlistItems.length };
+};
 
 export const useWishlistStore = create<WishlistState>((set, get) => ({
   wishlist: null,
   loading: false,
   error: null,
+  totalItems: 0,
 
   fetchWishlist: async (host: string) => {
     set({ loading: true, error: null });
@@ -35,7 +45,8 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
       if (data.guestToken && data.guestToken !== guestToken) {
         localStorage.setItem(GUEST_WISHLIST_TOKEN_KEY, data.guestToken);
       }
-      set({ wishlist: data, loading: false });
+      const { totalItems } = updateTotals(data);
+      set({ wishlist: data, totalItems, loading: false });
     } catch (error: any) {
       set({ error: error.response?.data?.message || 'Failed to fetch wishlist', loading: false });
     }
@@ -56,7 +67,8 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
       if (data.guestToken && data.guestToken !== guestToken) {
         localStorage.setItem(GUEST_WISHLIST_TOKEN_KEY, data.guestToken);
       }
-      set({ wishlist: data, loading: false });
+      const { totalItems } = updateTotals(data);
+      set({ wishlist: data, totalItems, loading: false });
     } catch (error: any) {
       set({ error: error.response?.data?.message || 'Failed to add item to wishlist', loading: false });
     }
@@ -77,7 +89,8 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
       if (data.guestToken && data.guestToken !== guestToken) {
         localStorage.setItem(GUEST_WISHLIST_TOKEN_KEY, data.guestToken);
       }
-      set({ wishlist: data, loading: false });
+      const { totalItems } = updateTotals(data);
+      set({ wishlist: data, totalItems, loading: false });
     } catch (error: any) {
       set({ error: error.response?.data?.message || 'Failed to remove item from wishlist', loading: false });
     }
@@ -98,9 +111,9 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
       if (data.guestToken && data.guestToken !== guestToken) {
         localStorage.setItem(GUEST_WISHLIST_TOKEN_KEY, data.guestToken);
       }
-      set({ wishlist: data.wishlist, loading: false }); // Assuming backend returns updated wishlist
-      // Optionally, you might want to trigger a cart fetch here if the cart store is separate
-      useCartStore.getState().setCart(data.cart); // Update cart state
+      const { totalItems } = updateTotals(data.wishlist);
+      set({ wishlist: data.wishlist, totalItems, loading: false });
+      useCartStore.getState().setCart(data.cart);
       if (data.cartGuestToken) {
         localStorage.setItem('guest_cart_token', data.cartGuestToken);
       } else {
@@ -111,8 +124,8 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
     }
   },
 
-  getTotalItems: () => {
-    const wishlist = get().wishlist;
-    return wishlist ? wishlist.items.length : 0;
+  setWishlist: (wishlist: Wishlist | null) => {
+    const { totalItems } = updateTotals(wishlist);
+    set({ wishlist, totalItems });
   },
 }));

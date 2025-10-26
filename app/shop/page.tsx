@@ -44,6 +44,7 @@ export default async function ShopPage() {
       <Typography variant="h3" component="h1" gutterBottom>
         Notre Collection
       </Typography>
+      <br/><br /><br />
       
       {categories && categories.length > 0 ? (
         <Box sx={{ mt: 4 }}>

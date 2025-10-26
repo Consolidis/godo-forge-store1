@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress, Box, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel } from '@mui/material';
+import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress, Box, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Alert } from '@mui/material';
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
@@ -82,53 +82,133 @@ const CheckoutPage = () => {
             <Typography variant="h4" component="h1" gutterBottom align="center">
                 Finaliser ma commande
             </Typography>
+            <Alert severity="info" sx={{ mb: 3 }}>
+                Please ensure your contact details, especially email and phone, are accurate as we will use them to contact you regarding your order.
+            </Alert>
             <Grid container spacing={4}>
                 <Grid item xs={12} md={7}>
-                    <Paper sx={{ p: 3, mb: 3 }}>
+                    <Paper sx={{ p: 3, mb: 3, bgcolor: 'grey.900', color: 'white' }}>
                         <Typography variant="h6" gutterBottom>
                             Adresse de livraison
                         </Typography>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="firstName" label="Prénom" fullWidth autoComplete="given-name" value={shippingAddress.firstName} onChange={handleInputChange} />
+                                <TextField required name="firstName" label="Prénom" fullWidth autoComplete="given-name" value={shippingAddress.firstName} onChange={handleInputChange}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      color: 'white',
+                                      '& fieldset': { borderColor: 'grey.700' },
+                                      '&:hover fieldset': { borderColor: 'grey.500' },
+                                      '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+                                    },
+                                    '& .MuiInputLabel-root': { color: 'grey.400' },
+                                    '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+                                  }}
+                                />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="lastName" label="Nom" fullWidth autoComplete="family-name" value={shippingAddress.lastName} onChange={handleInputChange} />
+                                <TextField required name="lastName" label="Nom" fullWidth autoComplete="family-name" value={shippingAddress.lastName} onChange={handleInputChange}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      color: 'white',
+                                      '& fieldset': { borderColor: 'grey.700' },
+                                      '&:hover fieldset': { borderColor: 'grey.500' },
+                                      '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+                                    },
+                                    '& .MuiInputLabel-root': { color: 'grey.400' },
+                                    '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+                                  }}
+                                />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField required name="street" label="Adresse" fullWidth autoComplete="shipping address-line1" value={shippingAddress.street} onChange={handleInputChange} />
+                                <TextField required name="street" label="Adresse" fullWidth autoComplete="shipping address-line1" value={shippingAddress.street} onChange={handleInputChange}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      color: 'white',
+                                      '& fieldset': { borderColor: 'grey.700' },
+                                      '&:hover fieldset': { borderColor: 'grey.500' },
+                                      '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+                                    },
+                                    '& .MuiInputLabel-root': { color: 'grey.400' },
+                                    '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+                                  }}
+                                />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="city" label="Ville" fullWidth autoComplete="shipping address-level2" value={shippingAddress.city} onChange={handleInputChange} />
+                                <TextField required name="city" label="Ville" fullWidth autoComplete="shipping address-level2" value={shippingAddress.city} onChange={handleInputChange}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      color: 'white',
+                                      '& fieldset': { borderColor: 'grey.700' },
+                                      '&:hover fieldset': { borderColor: 'grey.500' },
+                                      '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+                                    },
+                                    '& .MuiInputLabel-root': { color: 'grey.400' },
+                                    '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+                                  }}
+                                />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="postalCode" label="Code Postal" fullWidth autoComplete="shipping postal-code" value={shippingAddress.postalCode} onChange={handleInputChange} />
+                                <TextField required name="postalCode" label="Code Postal" fullWidth autoComplete="shipping postal-code" value={shippingAddress.postalCode} onChange={handleInputChange}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      color: 'white',
+                                      '& fieldset': { borderColor: 'grey.700' },
+                                      '&:hover fieldset': { borderColor: 'grey.500' },
+                                      '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+                                    },
+                                    '& .MuiInputLabel-root': { color: 'grey.400' },
+                                    '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+                                  }}
+                                />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="country" label="Pays" fullWidth autoComplete="shipping country" value={shippingAddress.country} onChange={handleInputChange} />
+                                <TextField required name="country" label="Pays" fullWidth autoComplete="shipping country" value={shippingAddress.country} onChange={handleInputChange}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      color: 'white',
+                                      '& fieldset': { borderColor: 'grey.700' },
+                                      '&:hover fieldset': { borderColor: 'grey.500' },
+                                      '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+                                    },
+                                    '& .MuiInputLabel-root': { color: 'grey.400' },
+                                    '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+                                  }}
+                                />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="phone" label="Téléphone" fullWidth autoComplete="tel" value={shippingAddress.phone} onChange={handleInputChange} />
+                                <TextField required name="phone" label="Téléphone" fullWidth autoComplete="tel" value={shippingAddress.phone} onChange={handleInputChange}
+                                  sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                      color: 'white',
+                                      '& fieldset': { borderColor: 'grey.700' },
+                                      '&:hover fieldset': { borderColor: 'grey.500' },
+                                      '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+                                    },
+                                    '& .MuiInputLabel-root': { color: 'grey.400' },
+                                    '& .MuiInputLabel-root.Mui-focused': { color: 'primary.main' },
+                                  }}
+                                />
                             </Grid>
                         </Grid>
                     </Paper>
-                    <Paper sx={{ p: 3 }}>
+                    <Paper sx={{ p: 3, bgcolor: 'grey.900', color: 'white' }}>
                         <FormControl component="fieldset">
-                            <FormLabel component="legend">Méthode d'expédition</FormLabel>
+                            <FormLabel component="legend" sx={{ color: 'white' }}>Méthode d'expédition</FormLabel>
                             <RadioGroup
                                 aria-label="shipping method"
                                 name="shippingMethod"
                                 value={shippingMethod}
                                 onChange={handleShippingChange}
                             >
-                                <FormControlLabel value="standard" control={<Radio />} label={`Standard - 5.00 $`} />
-                                <FormControlLabel value="express" control={<Radio />} label={`Express - 30.00 $`} />
+                                <FormControlLabel value="standard" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Standard - 5.00 $</Typography>} />
+                                <FormControlLabel value="express" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Express - 30.00 $</Typography>} />
                             </RadioGroup>
                         </FormControl>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} md={5}>
-                    <Paper sx={{ p: 3, position: 'relative', top: '100px' }}>
+                    <Paper sx={{ p: 3, position: 'relative', bgcolor: 'grey.900', color: 'white' }}>
                         {loading && (
                             <Box
                                 sx={{
@@ -153,16 +233,16 @@ const CheckoutPage = () => {
                         </Typography>
                         <Box sx={{ mb: 2 }}>
                             <Typography>Total Articles: {totalItems}</Typography>
-                            <Typography>Sous-total: {totalPrice.toFixed(2)} $</Typography>
-                            <Typography>Livraison: {shippingCost.toFixed(2)} $</Typography>
-                            <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold' }}>Total: {finalTotal.toFixed(2)} $</Typography>
+                            <Typography sx={{ color: 'orange' }}>Sous-total: {totalPrice.toFixed(2)} $</Typography>
+                            <Typography sx={{ color: 'orange' }}>Livraison: {shippingCost.toFixed(2)} $</Typography>
+                            <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold', color: 'orange' }}>Total: {finalTotal.toFixed(2)} $</Typography>
                         </Box>
                         {cart?.items?.map(item => (
                             <Box key={item.id} sx={{ display: 'flex', mb: 2, alignItems: 'center' }}>
-                                <img src={item.productVariant.image} alt={item.productVariant.product.title} width="60" height="60" style={{ marginRight: '16px' }} />
+                                <img src={item.productVariant.image} alt={item.productVariant.product.title} width="60" height="60" style={{ marginRight: '16px', borderRadius: '50%' }} />
                                 <Box>
                                     <Typography>{item.productVariant.product.title}</Typography>
-                                    <Typography color="text.secondary" variant="body2">Quantité: {item.quantity}</Typography>
+                                    <Typography sx={{ color: 'orange' }} variant="body2">Quantité: {item.quantity}</Typography>
                                 </Box>
                             </Box>
                         ))}

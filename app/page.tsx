@@ -70,6 +70,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <br/><br /><br />
       {/* Hero Section */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         {/* Background Gradient */}
@@ -173,6 +174,7 @@ export default function Home() {
       {products.length > 0 && (
         <HorizontalProductGrid
           title="Les Incontournables"
+          titleColor="white"
           products={products}
         />
       )}

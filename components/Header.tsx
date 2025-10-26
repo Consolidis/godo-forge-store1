@@ -70,73 +70,35 @@ const Header: React.FC = () => {
           {/* Left Section - Auth Links */}
           <Box sx={{ display: 'flex', gap: isMobile ? 1 : 2, justifyContent: 'flex-start', alignItems: 'center' }}>
             {isInitialized && isAuthenticated ? (
-              <Button
-                onClick={logout}
+              <IconButton
+                component={Link}
+                href="/customer"
                 sx={{
                   color: '#9ca3af',
-                  textTransform: 'none',
-                  fontSize: '0.875rem',
-                  fontWeight: 300,
                   '&:hover': {
                     color: '#fff',
                     backgroundColor: 'transparent',
                   },
                 }}
+                aria-label="Mon Compte"
               >
-                Se déconnecter
-              </Button>
+                <AccountCircleIcon />
+              </IconButton>
             ) : (
               <>
+                {pathname !== '/' && (
+                  <IconButton onClick={() => router.back()} sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Retour">
+                    <ArrowBackIcon />
+                  </IconButton>
+                )}
                 {isMobile ? (
-                  <>
-                    {isShopPage ? (
-                      <IconButton onClick={() => router.back()} sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Retour">
-                        <ArrowBackIcon />
-                      </IconButton>
-                    ) : (
-                      <IconButton component={Link} href="/register" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="S'inscrire">
-                        <PersonAddIcon />
-                      </IconButton>
-                    )}
-                    <IconButton component={Link} href="/login" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Se connecter">
-                      <LoginIcon />
-                    </IconButton>
-                  </>
+                  <IconButton component={Link} href="/login" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Se connecter">
+                    <LoginIcon />
+                  </IconButton>
                 ) : (
-                  <>
-                    <Button
-                      component={Link}
-                      href="/register"
-                      sx={{
-                        color: '#9ca3af',
-                        textTransform: 'none',
-                        fontSize: '0.875rem',
-                        fontWeight: 300,
-                        '&:hover': {
-                          color: '#fff',
-                          backgroundColor: 'transparent',
-                        },
-                      }}
-                    >
-                      S'inscrire
-                    </Button>
-                    <Button
-                      component={Link}
-                      href="/login"
-                      sx={{
-                        color: '#9ca3af',
-                        textTransform: 'none',
-                        fontSize: '0.875rem',
-                        fontWeight: 300,
-                        '&:hover': {
-                          color: '#fff',
-                          backgroundColor: 'transparent',
-                        },
-                      }}
-                    >
-                      Se connecter
-                    </Button>
-                  </>
+                  <IconButton component={Link} href="/login" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Se connecter">
+                    <LoginIcon />
+                  </IconButton>
                 )}
               </>
             )}
@@ -148,7 +110,6 @@ const Header: React.FC = () => {
               <Typography
                 variant="h5"
                 sx={{
-                  fontWeight: 700,
                   color: '#fff',
                   letterSpacing: '-0.02em',
                   cursor: 'pointer',
@@ -165,22 +126,6 @@ const Header: React.FC = () => {
 
           {/* Right Section - Icons */}
           <Box sx={{ display: 'flex', gap: isMobile ? 1 : 2, justifyContent: 'flex-end', alignItems: 'center' }}>
-            {isInitialized && isAuthenticated && !pathname.startsWith('/customer') && (
-              <IconButton
-                component={Link}
-                href="/customer"
-                sx={{
-                  color: '#9ca3af',
-                  '&:hover': {
-                    color: '#fff',
-                    backgroundColor: 'transparent',
-                  },
-                }}
-                aria-label="Mon Compte"
-              >
-                <AccountCircleIcon />
-              </IconButton>
-            )}
             <IconButton
               component={Link}
               href="/wishlist"

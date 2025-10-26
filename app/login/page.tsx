@@ -74,14 +74,15 @@ export default function LoginPage() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
+      minHeight: 'calc(100vh - 128px)',
       bgcolor: 'black',
       py: 4,
     }}>
+      <br/><br /><br />
       <Box
         sx={{
           p: { xs: 3, sm: 5 },
+          pt: 4, // Add top padding to push content down
           borderRadius: '12px',
           boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.5)',
           bgcolor: 'grey.900',

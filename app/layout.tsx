@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="pt-24">
+      <body className="pt-32">
         <SnackbarProviderWrapper>
           <AuthProvider>
 

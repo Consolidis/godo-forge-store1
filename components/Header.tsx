@@ -8,6 +8,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'; // Import AccountCircleIcon
 import { usePathname, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCartStore } from '@/store/cartStore';
@@ -164,6 +165,22 @@ const Header: React.FC = () => {
 
           {/* Right Section - Icons */}
           <Box sx={{ display: 'flex', gap: isMobile ? 1 : 2, justifyContent: 'flex-end', alignItems: 'center' }}>
+            {isInitialized && isAuthenticated && !pathname.startsWith('/customer') && (
+              <IconButton
+                component={Link}
+                href="/customer"
+                sx={{
+                  color: '#9ca3af',
+                  '&:hover': {
+                    color: '#fff',
+                    backgroundColor: 'transparent',
+                  },
+                }}
+                aria-label="Mon Compte"
+              >
+                <AccountCircleIcon />
+              </IconButton>
+            )}
             <IconButton
               component={Link}
               href="/wishlist"

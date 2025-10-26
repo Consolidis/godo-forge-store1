@@ -51,23 +51,12 @@ api.interceptors.request.use(
     }
 
     // Determine which Authorization header to send
-    // If the URL starts with /api/v1/customer, use the customer's JWT
-    // Otherwise, use the shop's API key
-    if (config.url?.startsWith('/api/v1/customer')) { // Check if it's a customer-specific route
-      if (customerJwtToken) {
-        config.headers.Authorization = `Bearer ${customerJwtToken}`;
-      } else {
-        // If it's a customer route but no JWT, it means the user is not logged in.
-        // The backend will handle 401 if authentication is required for this route.
-        // Do not send shop API key here.
-        delete config.headers.Authorization; // Ensure no old auth header is sent
-      }
-    } else { // For all other routes (public shop routes)
-      if (shopApiKey) {
-        config.headers.Authorization = `Bearer ${shopApiKey}`;
-      } else {
-        delete config.headers.Authorization; // Ensure no old auth header is sent
-      }
+    if (customerJwtToken) {
+      config.headers.Authorization = `Bearer ${customerJwtToken}`;
+    } else if (shopApiKey) {
+      config.headers.Authorization = `Bearer ${shopApiKey}`;
+    } else {
+      delete config.headers.Authorization; // Ensure no old auth header is sent
     }
 
     // Add X-Guest-Wishlist-Token if available
@@ -78,6 +67,24 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor to handle token expiration
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      const errorMessage = error.response.data?.message;
+      if (errorMessage === 'Expired JWT Token') {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('jwt_token');
+          // Redirect to login page
+          window.location.href = '/login';
+        }
+      }
+    }
     return Promise.reject(error);
   }
 );

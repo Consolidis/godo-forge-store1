@@ -35,6 +35,8 @@ export default function LoginPage() {
         password,
       }, { headers });
 
+      console.log('Login API Response:', response.data);
+
       const { token, cart = null, wishlist = null } = response.data; // Provide default null values
       localStorage.setItem('jwt_token', token);
 

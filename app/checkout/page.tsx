@@ -50,6 +50,12 @@ const CheckoutPage = () => {
             // Add X-Shop-Domain header
             headers['X-Shop-Domain'] = window.location.hostname;
 
+            const customerJwtToken = localStorage.getItem('jwt_token');
+            if (customerJwtToken) {
+                headers['Authorization'] = `Bearer ${customerJwtToken}`;
+                console.log('CheckoutPage: Sending Authorization header:', headers['Authorization']);
+            }
+
             const response = await api.post('/public/api/v1/checkout', {
                 shipping_address: shippingAddress,
                 shipping_method: shippingMethod,

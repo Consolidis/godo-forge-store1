@@ -259,13 +259,26 @@ const CheckoutPage = () => {
                         </Typography>
                        
                         {cart?.items?.map(item => (
-                            <Box sx={{ mb: 2 }}>
+                            <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    {item.productVariant.image && (
+                                        <img
+                                            src={item.productVariant.image}
+                                            alt={item.productVariant.product.title}
+                                            style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }}
+                                        />
+                                    )}
+                                    <Typography variant="body2" color="white">{item.productVariant.product.title} ({item.quantity})</Typography>
+                                </Box>
+                                <Typography variant="body2" color="white">{(convertUSDtoXAF((item.productVariant.sellingPrice ?? item.productVariant.price) * item.quantity)).toFixed(2)} FCFA</Typography>
+                            </Box>
+                        ))} 
+                        <Box sx={{ mb: 2, mt: 2, borderTop: '1px solid grey.700', pt: 2 }}>
                             <Typography>Total Items: {totalItems}</Typography>
                             <Typography sx={{ color: 'orange' }}>Subtotal: {totalPriceXAF.toFixed(2)} FCFA</Typography>
                             <Typography sx={{ color: 'orange' }}>Shipping: {shippingCostXAF.toFixed(2)} FCFA</Typography>
                             <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold', color: 'orange' }}>Total: {finalTotalXAF.toFixed(2)} FCFA</Typography>
-                          </Box>
-                        ))}
+                        </Box>
                         {!paymentLinks ? (
                             <Button
                                 variant="contained"

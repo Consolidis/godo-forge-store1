@@ -44,19 +44,19 @@ export default function CustomerOrdersPage() {
   return (
     <Box>
       <Typography variant="h5" component="h2" gutterBottom>
-        Mes Commandes
+        My Orders
       </Typography>
       <Paper sx={{ p: 3, mt: 3 }}>
         {orders.length === 0 ? (
-          <Typography>Vous n'avez pas encore passé de commandes.</Typography>
+          <Typography>You haven't placed any orders yet.</Typography>
         ) : (
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>ID Commande</TableCell>
+                  <TableCell>Order ID</TableCell>
                   <TableCell>Date</TableCell>
-                  <TableCell>Statut</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell align="right">Total</TableCell>
                 </TableRow>
               </TableHead>

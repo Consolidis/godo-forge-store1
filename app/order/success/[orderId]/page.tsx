@@ -17,19 +17,18 @@ const OrderSuccessPage = () => {
                 <Box sx={{ mb: 2 }}>
                     <CheckCircleOutlineIcon color="success" sx={{ fontSize: 60 }} />
                 </Box>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Merci pour votre commande !
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    Votre commande a été passée avec succès.
-                </Typography>
-                <Typography color="text.secondary">
-                    Votre numéro de commande est le : <strong>{orderId}</strong>
-                </Typography>
-                <Typography color="text.secondary" sx={{ mt: 2 }}>
-                    Vous recevrez bientôt un e-mail de confirmation.
-                </Typography>
-            </Paper>
+                            <Typography variant="h4" component="h1" gutterBottom>
+                                Thank you for your order!
+                            </Typography>
+                            <Typography variant="h6" gutterBottom>
+                                Your order has been placed successfully.
+                            </Typography>
+                            <Typography color="text.secondary">
+                                Your order number is: <strong>{orderId}</strong>
+                            </Typography>
+                            <Typography color="text.secondary" sx={{ mt: 2 }}>
+                                You will receive a confirmation email shortly.
+                            </Typography>            </Paper>
         </Container>
     );
 };

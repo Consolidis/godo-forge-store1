@@ -1,3 +1,5 @@
+"use client";
+
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "../components/Header";
@@ -7,26 +9,31 @@ import { AuthProvider } from "../providers/AuthProvider";
 
 import SnackbarProviderWrapper from "../components/SnackbarProviderWrapper";
 import ScrollToTopButton from "../components/ScrollToTopButton";
-
-export const metadata: Metadata = {
-  title: "Watchtech",
-  description: "Découvrez Watchtech, la montre intelligente qui redéfinit la puissance et le style.",
-};
+import { useShopStore } from "../store/shopStore"; // Import useShopStore
+import { useEffect } from "react"; // Import useEffect
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { fetchShop } = useShopStore();
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    fetchShop(host);
+  }, [fetchShop]);
+
   return (
     <html lang="en">
-      <body className="pt-32">
+      <body>
         <SnackbarProviderWrapper>
           <AuthProvider>
 
           <ClientOnly>
             <Header />
           </ClientOnly>
+          <br /><br /><br />
           {children}
           <Footer />
           <ScrollToTopButton />

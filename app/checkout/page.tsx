@@ -6,11 +6,17 @@ import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
+import { convertUSDtoXAF, USD_TO_XAF_RATE } from '@/lib/currency';
 
 const SHIPPING_COSTS = {
     standard: 5,
     express: 30,
 };
+
+interface PaymentLinks {
+    cardLink: string;
+    whatsappLink: string;
+}
 
 const CheckoutPage = () => {
     const router = useRouter();
@@ -27,6 +33,7 @@ const CheckoutPage = () => {
         country: '',
         phone: ''
     });
+    const [paymentLinks, setPaymentLinks] = useState<PaymentLinks | null>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -61,26 +68,44 @@ const CheckoutPage = () => {
                 shipping_method: shippingMethod,
             }, { headers });
 
-            if (response.status === 201) {
-                const order = response.data;
-                router.push(`/order/success/${order.id}`);
+            if (response.status === 200) {
+                const paymentData = response.data;
+                if (paymentData.cardLink && paymentData.whatsappLink) {
+                    setPaymentLinks(paymentData);
+                } else {
+                    setError('Failed to get payment links. Please try again.');
+                }
             } else {
-                setError('La création de la commande a échoué. Veuillez réessayer.');
+                setError('Order creation failed. Please try again.');
             }
         } catch (err) {
-            setError('Une erreur est survenue. Veuillez réessayer.');
+            setError('An error occurred. Please try again.');
             console.error(err);
         }
         setLoading(false);
     };
 
+
+
+
     const shippingCost = SHIPPING_COSTS[shippingMethod as keyof typeof SHIPPING_COSTS];
     const finalTotal = totalPrice + shippingCost;
+    const finalTotalXAF = convertUSDtoXAF(finalTotal);
+    const shippingCostXAF = convertUSDtoXAF(shippingCost);
+    const totalPriceXAF = convertUSDtoXAF(totalPrice);
+
+// ...
+
+                              
+
+// // ...
+
+                       
 
     return (
         <Container sx={{ mt: 12, mb: 8 }}>
             <Typography variant="h4" component="h1" gutterBottom align="center">
-                Finaliser ma commande
+                Finalize your order
             </Typography>
             <Alert severity="info" sx={{ mb: 3 }}>
                 Please ensure your contact details, especially email and phone, are accurate as we will use them to contact you regarding your order.
@@ -89,11 +114,11 @@ const CheckoutPage = () => {
                 <Grid item xs={12} md={7}>
                     <Paper sx={{ p: 3, mb: 3, bgcolor: 'grey.900', color: 'white' }}>
                         <Typography variant="h6" gutterBottom>
-                            Adresse de livraison
+                            Shipping Address
                         </Typography>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="firstName" label="Prénom" fullWidth autoComplete="given-name" value={shippingAddress.firstName} onChange={handleInputChange}
+                                <TextField required name="firstName" label="First Name" fullWidth autoComplete="given-name" value={shippingAddress.firstName} onChange={handleInputChange}
                                   sx={{
                                     '& .MuiOutlinedInput-root': {
                                       color: 'white',
@@ -107,7 +132,7 @@ const CheckoutPage = () => {
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="lastName" label="Nom" fullWidth autoComplete="family-name" value={shippingAddress.lastName} onChange={handleInputChange}
+                                <TextField required name="lastName" label="Last Name" fullWidth autoComplete="family-name" value={shippingAddress.lastName} onChange={handleInputChange}
                                   sx={{
                                     '& .MuiOutlinedInput-root': {
                                       color: 'white',
@@ -121,7 +146,7 @@ const CheckoutPage = () => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField required name="street" label="Adresse" fullWidth autoComplete="shipping address-line1" value={shippingAddress.street} onChange={handleInputChange}
+                                <TextField required name="street" label="Address" fullWidth autoComplete="shipping address-line1" value={shippingAddress.street} onChange={handleInputChange}
                                   sx={{
                                     '& .MuiOutlinedInput-root': {
                                       color: 'white',
@@ -135,7 +160,7 @@ const CheckoutPage = () => {
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="city" label="Ville" fullWidth autoComplete="shipping address-level2" value={shippingAddress.city} onChange={handleInputChange}
+                                <TextField required name="city" label="City" fullWidth autoComplete="shipping address-level2" value={shippingAddress.city} onChange={handleInputChange}
                                   sx={{
                                     '& .MuiOutlinedInput-root': {
                                       color: 'white',
@@ -149,7 +174,7 @@ const CheckoutPage = () => {
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="postalCode" label="Code Postal" fullWidth autoComplete="shipping postal-code" value={shippingAddress.postalCode} onChange={handleInputChange}
+                                <TextField required name="postalCode" label="Postal Code" fullWidth autoComplete="shipping postal-code" value={shippingAddress.postalCode} onChange={handleInputChange}
                                   sx={{
                                     '& .MuiOutlinedInput-root': {
                                       color: 'white',
@@ -163,7 +188,7 @@ const CheckoutPage = () => {
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="country" label="Pays" fullWidth autoComplete="shipping country" value={shippingAddress.country} onChange={handleInputChange}
+                                <TextField required name="country" label="Country" fullWidth autoComplete="shipping country" value={shippingAddress.country} onChange={handleInputChange}
                                   sx={{
                                     '& .MuiOutlinedInput-root': {
                                       color: 'white',
@@ -177,7 +202,7 @@ const CheckoutPage = () => {
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField required name="phone" label="Téléphone" fullWidth autoComplete="tel" value={shippingAddress.phone} onChange={handleInputChange}
+                                <TextField required name="phone" label="Phone" fullWidth autoComplete="tel" value={shippingAddress.phone} onChange={handleInputChange}
                                   sx={{
                                     '& .MuiOutlinedInput-root': {
                                       color: 'white',
@@ -194,15 +219,16 @@ const CheckoutPage = () => {
                     </Paper>
                     <Paper sx={{ p: 3, bgcolor: 'grey.900', color: 'white' }}>
                         <FormControl component="fieldset">
-                            <FormLabel component="legend" sx={{ color: 'white' }}>Méthode d'expédition</FormLabel>
+                            <FormLabel component="legend" sx={{ color: 'white' }}>Shipping Method</FormLabel>
                             <RadioGroup
                                 aria-label="shipping method"
                                 name="shippingMethod"
                                 value={shippingMethod}
                                 onChange={handleShippingChange}
                             >
-                                <FormControlLabel value="standard" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Standard - 5.00 $</Typography>} />
-                                <FormControlLabel value="express" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Express - 30.00 $</Typography>} />
+                                  <FormControlLabel value="standard" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Standard - {convertUSDtoXAF(SHIPPING_COSTS.standard).toFixed(2)} FCFA</Typography>} />
+                                <FormControlLabel value="express" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Express - {convertUSDtoXAF(SHIPPING_COSTS.express).toFixed(2)} FCFA</Typography>} />
+                                
                             </RadioGroup>
                         </FormControl>
                     </Paper>
@@ -229,33 +255,50 @@ const CheckoutPage = () => {
                             </Box>
                         )}
                         <Typography variant="h6" gutterBottom>
-                            Résumé de la commande
+                            Order Summary
                         </Typography>
-                        <Box sx={{ mb: 2 }}>
-                            <Typography>Total Articles: {totalItems}</Typography>
-                            <Typography sx={{ color: 'orange' }}>Sous-total: {totalPrice.toFixed(2)} $</Typography>
-                            <Typography sx={{ color: 'orange' }}>Livraison: {shippingCost.toFixed(2)} $</Typography>
-                            <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold', color: 'orange' }}>Total: {finalTotal.toFixed(2)} $</Typography>
-                        </Box>
+                       
                         {cart?.items?.map(item => (
-                            <Box key={item.id} sx={{ display: 'flex', mb: 2, alignItems: 'center' }}>
-                                <img src={item.productVariant.image} alt={item.productVariant.product.title} width="60" height="60" style={{ marginRight: '16px', borderRadius: '50%' }} />
-                                <Box>
-                                    <Typography>{item.productVariant.product.title}</Typography>
-                                    <Typography sx={{ color: 'orange' }} variant="body2">Quantité: {item.quantity}</Typography>
-                                </Box>
-                            </Box>
+                            <Box sx={{ mb: 2 }}>
+                            <Typography>Total Items: {totalItems}</Typography>
+                            <Typography sx={{ color: 'orange' }}>Subtotal: {totalPriceXAF.toFixed(2)} FCFA</Typography>
+                            <Typography sx={{ color: 'orange' }}>Shipping: {shippingCostXAF.toFixed(2)} FCFA</Typography>
+                            <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold', color: 'orange' }}>Total: {finalTotalXAF.toFixed(2)} FCFA</Typography>
+                          </Box>
                         ))}
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            fullWidth
-                            disabled={loading}
-                            onClick={handleCheckout}
-                            sx={{ mt: 2 }}
-                        >
-                            {loading ? <CircularProgress size={24} /> : 'Valider et Payer'}
-                        </Button>
+                        {!paymentLinks ? (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                                disabled={loading}
+                                onClick={handleCheckout}
+                                sx={{ mt: 2 }}
+                            >
+                                {loading ? <CircularProgress size={24} /> : 'Confirm and Pay'}
+                            </Button>
+                        ) : (
+                            <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <Button
+                                    variant="contained"
+                                    color="success"
+                                    fullWidth
+                                    href={paymentLinks.whatsappLink}
+                                    target="_blank"
+                                >
+                                    Pay with WhatsApp
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    fullWidth
+                                    href={paymentLinks.cardLink}
+                                    target="_blank"
+                                >
+                                    Pay by Card
+                                </Button>
+                            </Box>
+                        )}
                         {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
                     </Paper>
                 </Grid>

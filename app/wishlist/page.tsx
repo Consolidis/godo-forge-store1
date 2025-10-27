@@ -47,7 +47,7 @@ export default function WishlistPage() {
   if (error) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'black' }}>
-        <Typography color="error">Erreur: {error}</Typography>
+        <Typography color="error">Error: {error}</Typography>
       </Box>
     );
   }
@@ -56,13 +56,13 @@ export default function WishlistPage() {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center', bgcolor: 'black', color: 'white', minHeight: '100vh' }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Votre liste de souhaits est vide
+          Your wishlist is empty
         </Typography>
         <Typography variant="body1" sx={{ mb: 4 }}>
-          Il semble que vous n'ayez encore rien ajouté à votre liste de souhaits.
+          It seems you haven't added anything to your wishlist yet.
         </Typography>
         <Button component={Link} href="/shop" variant="contained" color="primary" sx={{ bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
-          Commencer vos achats
+          Start Shopping
         </Button>
       </Container>
     );
@@ -71,7 +71,7 @@ export default function WishlistPage() {
   return (
     <Container maxWidth="lg" sx={{ py: 8, bgcolor: 'black', color: 'white', minHeight: '100vh' }}>
       <Typography variant="h3" component="h1" gutterBottom>
-        Votre Liste de Souhaits
+        My Wishlist
       </Typography>
 
       <Grid container spacing={4}>
@@ -100,7 +100,7 @@ export default function WishlistPage() {
                   onClick={() => handleMoveToCart(item.id)} // Pass item.id
                   sx={{ bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}
                 >
-                  Ajouter au Panier
+                  Add to Cart
                 </Button>
                 <IconButton onClick={() => handleRemoveItem(item.id)} color="error">
                   <Delete />

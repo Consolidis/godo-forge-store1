@@ -72,21 +72,21 @@ export default function CustomerProfilePage() {
   return (
     <Box>
       <Typography variant="h5" component="h2" gutterBottom>
-        Mon Profil
+        My Profile
       </Typography>
       <Paper sx={{ p: 3, mt: 3 }}>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
-            label="Prénom"
+            label="First Name"
             name="firstName"
             value={formData.firstName}
             onChange={handleInputChange}
             fullWidth
           />
           <TextField
-            label="Nom"
+            label="Last Name"
             name="lastName"
             value={formData.lastName}
             onChange={handleInputChange}
@@ -100,7 +100,7 @@ export default function CustomerProfilePage() {
             disabled // Email update not allowed via this form
           />
           <Button type="submit" variant="contained" disabled={loading} sx={{ mt: 2 }}>
-            {loading ? <CircularProgress size={24} /> : 'Enregistrer les modifications'}
+            {loading ? <CircularProgress size={24} /> : 'Save Changes'}
           </Button>
         </Box>
       </Paper>

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import api from '../lib/api';
 import { useAuth } from "../providers/AuthProvider";
 import HorizontalProductGrid from '../components/HorizontalProductGrid';
-import { Button, Box } from '@mui/material';
+import { Button, Box, Typography } from '@mui/material';
 import Link from 'next/link';
 
 interface ShopInfo {
@@ -89,9 +89,10 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-5xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent"
+              Style={{color:'white'}}
+              className="text-5xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text "
             >
-              {shopInfo?.name || 'Waltech'}
+              {shopInfo?.name || 'Waltechvv'}
             </motion.h1>
             
             {shopInfo?.themeCustomization?.description && (
@@ -111,23 +112,38 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, justifyContent: 'center', alignItems: 'center' }}>
-                <Button
-                  component={Link}
-                  href="/shop"
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    borderRadius: '9999px',
-                    px: 4,
-                    py: 1.5,
-                    bgcolor: 'white',
-                    color: 'black',
-                    '&:hover': { bgcolor: 'grey.200' }
-                  }}
-                >
-                  Découvrir la Collection
-                </Button>
+              {/* <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, justifyContent: 'center', alignItems: 'center' }}> */}
+            {/* <Typography variant="h4" component="h1" sx={{ color: 'white', fontWeight: 'bold', mb: 2 }}>
+              Discover the Collection
+            </Typography> */}
+            {/* <Typography variant="h6" sx={{ color: 'grey.400', mb: 4 }}>
+              Explore our exclusive collection of smartwatches that combine cutting-edge technology with refined design.
+            </Typography> */}
+
+           
+          {/* </Box> */}
+
+        {/* Must-Haves Section */}
+        {/* <Box sx={{ mt: 8, mb: 4 }}>
+          <Typography variant="h4" component="h2" align="center" gutterBottom color="white">
+            Must-Haves
+          </Typography>
+        </Box> */}
+
+        {/* Call to Action Section */}
+        {/* <Box sx={{ py: 8, bgcolor: 'grey.900', textAlign: 'center' }}> */}
+          {/* <Typography variant="h5" component="h3" sx={{ color: 'white', mb: 3 }}>
+            Ready to redefine your time?
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'grey.400', mb: 4 }}>
+            Join the Watchtech revolution. Explore our smartwatches and find the one that suits you.
+          </Typography>
+          <Button component={Link} href="/shop" variant="contained" sx={{ bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
+            Explore Now
+          </Button> */}
+        {/* </Box> */}
+
+        <br /><br />
                 {!isAuthenticated && (
                   <Button
                     component={Link}
@@ -146,7 +162,9 @@ export default function Home() {
                     Créer un Compte
                   </Button>
                 )}
-              </Box>
+
+                <br /><br />
+              
             </motion.div>
           </motion.div>
         </div>
@@ -212,7 +230,7 @@ export default function Home() {
             Redéfinissez votre Style
           </h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl mx-auto">
-            Découvrez notre collection exclusive de montres intelligentes qui allient technologie de pointe et design raffiné.
+            {shopInfo.themeCustomization.description}
           </p>
 
           <br /><br />
@@ -236,7 +254,6 @@ export default function Home() {
         
         <br /><br /><br />
       </motion.section>
-
       
     </div>
   );

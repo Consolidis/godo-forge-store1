@@ -10,12 +10,12 @@ export default function CustomerDashboardPage() {
   return (
     <Box>
       <Typography variant="h5" component="h2" gutterBottom>
-        Bienvenue, {user?.firstName || user?.email} !
+        Welcome, {user?.firstName || user?.email} !
       </Typography>
       <Paper sx={{ p: 3, mt: 3 }}>
-        <Typography variant="body1">Ceci est votre tableau de bord client.</Typography>
+        <Typography variant="body1">This is your customer dashboard.</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Utilisez le menu à gauche pour naviguer dans votre espace personnel.
+          Use the menu on the left to navigate your personal area.
         </Typography>
       </Paper>
     </Box>

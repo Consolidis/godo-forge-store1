@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
 import { useSnackbar } from 'notistack';
+import { convertUSDtoXAF } from '@/lib/currency';
 
 export default function CartPage() {
   const { cart, loading, error, fetchCart, updateItemQuantity, removeItem, clearCart, totalPrice } = useCartStore();
@@ -66,42 +67,42 @@ export default function CartPage() {
   if (!cart || cart.items.length === 0) {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center', bgcolor: 'black', color: 'white', minHeight: '100vh' }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Votre panier est vide
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 4 }}>
-          Il semble que vous n'ayez encore rien ajouté à votre panier.
-        </Typography>
-        <Button component={Link} href="/shop" variant="contained" color="primary" sx={{ bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
-          Commencer vos achats
-        </Button>
-      </Container>
-    );
-  }
+          <Typography variant="h4" component="h1" gutterBottom>
+            Your cart is empty
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 4 }}>
+            It seems you haven't added anything to your cart yet.
+          </Typography>
+          <Button component={Link} href="/shop" variant="contained" color="primary" sx={{ bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
+            Start Shopping
+          </Button>
+        </Container>
+      );
+    }
 
-  return (
-    <Container maxWidth="lg" sx={{ py: 8, bgcolor: 'black', color: 'white', minHeight: '100vh' }}>
-      <Typography variant="h3" component="h1" gutterBottom>
-        Votre Panier
-      </Typography>
+    return (
+      <Container maxWidth="lg" sx={{ py: 8, bgcolor: 'black', color: 'white', minHeight: '100vh' }}>
+        <Typography variant="h3" component="h1" gutterBottom>
+          Your Cart
+        </Typography>
 
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={8}>
-          {cart.items.map((item) => (
-            <Paper key={item.id} sx={{ p: 2, mb: 3, display: 'flex', alignItems: 'center', bgcolor: 'grey.900', color: 'white' }}>
-              <Box sx={{ width: 100, height: 100, position: 'relative', mr: 2 }}>
-                <Image
-                  src={item.productVariant.image || '/placeholder.png'}
-                  alt={item.productVariant.name || item.productVariant.sku || 'Image du produit'}
-                  layout="fill"
-                  objectFit="cover"
-                  priority
-                />
-              </Box>
-              <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="h6">{item.productVariant.name || item.productVariant.sku}</Typography>
-                <Typography variant="body2" color="grey.400">
-                  {item.productVariant.sellingPrice ? `${item.productVariant.sellingPrice.toFixed(2)} $` : `${item.productVariant.price.toFixed(2)} $`}
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={8}>
+            {cart.items.map((item) => (
+              <Paper key={item.id} sx={{ p: 2, mb: 3, display: 'flex', alignItems: 'center', bgcolor: 'grey.900', color: 'white' }}>
+                <Box sx={{ width: 100, height: 100, position: 'relative', mr: 2 }}>
+                  <Image
+                    src={item.productVariant.image || '/placeholder.png'}
+                    alt={item.productVariant.name || item.productVariant.sku || 'Product Image'}
+                    layout="fill"
+                    objectFit="cover"
+                    priority
+                  />
+                </Box>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6">{item.productVariant.name || item.productVariant.sku}</Typography>
+                  <Typography variant="body2" color="grey.400">
+                    {item.productVariant.sellingPrice ? `${convertUSDtoXAF(item.productVariant.sellingPrice).toFixed(2)} FCFA` : `${convertUSDtoXAF(item.productVariant.price).toFixed(2)} FCFA`}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -128,7 +129,7 @@ export default function CartPage() {
             <Typography variant="h5" gutterBottom>Résumé de la commande</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography>Sous-total:</Typography>
-              <Typography>{totalPrice.toFixed(2)} $</Typography>
+              <Typography>{convertUSDtoXAF(totalPrice).toFixed(2)} FCFA</Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
               <Typography>Livraison:</Typography>
@@ -136,7 +137,7 @@ export default function CartPage() {
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid grey.700', pt: 2 }}>
               <Typography variant="h6">Total:</Typography>
-              <Typography variant="h6">{totalPrice.toFixed(2)} $</Typography>
+              <Typography variant="h6">{convertUSDtoXAF(totalPrice).toFixed(2)} FCFA</Typography>
             </Box>
             <Button component={Link} href="/checkout" variant="contained" fullWidth sx={{ mt: 3, bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
               Passer à la caisse

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '../../../lib/api';
+import { convertUSDtoXAF } from '../../../lib/currency';
 
 import { Container, Box, Typography, CircularProgress, IconButton } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -133,7 +134,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           />
 
           <Typography variant="h4" fontWeight="bold" color="primary.light">
-            {selectedVariant?.sellingPrice ? `${selectedVariant.sellingPrice.toFixed(2)} $` : ''}
+            {selectedVariant?.sellingPrice ? `${convertUSDtoXAF(selectedVariant.sellingPrice).toFixed(2)} FCFA` : ''}
           </Typography>
 
           <Typography 

@@ -116,7 +116,7 @@ export default function RegisterPage() {
       >
         
         <Typography component="h1" variant="h4" sx={{ mb: 3, color: 'white', fontWeight: 'bold' }}>
-          Créez votre compte
+          Create your account
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
           <TextField
@@ -124,7 +124,7 @@ export default function RegisterPage() {
             required
             fullWidth
             id="first-name"
-            label="Prénom"
+            label="First Name"
             name="firstName"
             autoComplete="given-name"
             autoFocus
@@ -147,7 +147,7 @@ export default function RegisterPage() {
             required
             fullWidth
             id="last-name"
-            label="Nom"
+            label="Last Name"
             name="lastName"
             autoComplete="family-name"
             value={lastName}
@@ -170,7 +170,7 @@ export default function RegisterPage() {
             required
             fullWidth
             id="email"
-            label="Adresse e-mail"
+            label="Email Address"
             name="email"
             autoComplete="email"
             value={email}
@@ -193,7 +193,7 @@ export default function RegisterPage() {
             required
             fullWidth
             name="password"
-            label="Mot de passe"
+            label="Password"
             type="password"
             id="password"
             autoComplete="new-password"
@@ -238,11 +238,11 @@ export default function RegisterPage() {
             disabled={loading}
             startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
           >
-            {loading ? 'Inscription...' : "S'inscrire"}
+            {loading ? 'Signing Up...' : "Sign Up"}
           </Button>
           <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 2 }}>
             <MuiLink component={Link} href="/login" variant="body2" sx={{ color: 'primary.light', textDecoration: 'none' }}>
-              Déjà un compte ? Se connecter
+              Already have an account? Log In
             </MuiLink>
           </Box>
         </Box>

@@ -6,6 +6,7 @@ import { AddShoppingCart } from '@mui/icons-material';
 
 import { useCartStore } from '@/store/cartStore';
 import { useSnackbar } from 'notistack';
+import { convertUSDtoXAF } from '@/lib/currency';
 
 interface ProductVariant {
   id: string;
@@ -36,7 +37,7 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
     if (isMobile) {
       const price = variant.sellingPrice;
       if (price) {
-        setSnackbarMessage(`${price.toFixed(2)} $`);
+        setSnackbarMessage(`${convertUSDtoXAF(price).toFixed(2)} FCFA`);
         setSnackbarOpen(true);
       }
     }
@@ -144,7 +145,7 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
             }}
             onClick={handleAddToCart}
           >
-            {isLoading ? 'Ajout en cours...' : `Ajouter au Panier ${displayPrice ? `(${displayPrice.toFixed(2)} $)` : ''}`}
+            {isLoading ? 'Ajout en cours...' : `Ajouter au Panier ${displayPrice ? `(${convertUSDtoXAF(displayPrice).toFixed(2)} FCFA)` : ''}`}
           </Button>
         )}
       </Toolbar>

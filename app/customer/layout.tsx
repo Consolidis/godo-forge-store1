@@ -35,7 +35,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
   return (
     <Container maxWidth="lg" sx={{ mt: 12, mb: 8, minHeight: '100vh' }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Mon Espace Client
+        My Customer Area
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
         <Box sx={{ width: { xs: '100%', md: '250px' }, flexShrink: 0 }}>
@@ -52,7 +52,7 @@ export default function CustomerLayout({ children }: { children: React.ReactNode
           <List component="nav" aria-label="customer actions">
             <ListItem disablePadding>
               <ListItemButton component={Link} href="/logout" sx={{ color: 'error.main' }}>
-                <ListItemText primary="Se déconnecter" />
+                <ListItemText primary="Logout" />
               </ListItemButton>
             </ListItem>
           </List>

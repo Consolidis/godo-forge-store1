@@ -93,7 +93,7 @@ export default function LoginPage() {
         }}
       >
         <Typography component="h1" variant="h4" sx={{ mb: 3, color: 'white', fontWeight: 'bold' }}>
-          Connectez-vous
+          Log In
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
           <TextField
@@ -101,7 +101,7 @@ export default function LoginPage() {
             required
             fullWidth
             id="email"
-            label="Adresse e-mail"
+            label="Email Address"
             name="email"
             autoComplete="email"
             autoFocus
@@ -124,7 +124,7 @@ export default function LoginPage() {
             required
             fullWidth
             name="password"
-            label="Mot de passe"
+            label="Password"
             type="password"
             id="password"
             autoComplete="current-password"
@@ -164,14 +164,14 @@ export default function LoginPage() {
             disabled={loading}
             startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
           >
-            {loading ? 'Connexion...' : 'Se connecter'}
+            {loading ? 'Logging In...' : 'Log In'}
           </Button>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2 }}>
             <MuiLink component={Link} href="#" variant="body2" sx={{ color: 'primary.light', textDecoration: 'none' }}>
-              Mot de passe oublié ?
+              Forgot password?
             </MuiLink>
             <MuiLink component={Link} href="/register" variant="body2" sx={{ color: 'primary.light', textDecoration: 'none' }}>
-              Pas encore de compte ? S'inscrire
+              Don't have an account? Sign Up
             </MuiLink>
           </Box>
         </Box>

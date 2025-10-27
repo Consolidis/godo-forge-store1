@@ -13,6 +13,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore'; // Import useWishlistStore
+import { convertUSDtoXAF } from '@/lib/currency';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout, isInitialized } = useAuth(); // Get isInitialized
@@ -24,7 +25,7 @@ const Header: React.FC = () => {
   const router = useRouter();
   const isShopPage = pathname.startsWith('/shop/');
 
-  const { fetchCart, totalItems: cartCount } = useCartStore();
+  const { fetchCart, totalItems: cartCount, totalPrice } = useCartStore();
   const { fetchWishlist, totalItems: wishlistCount } = useWishlistStore();
 
   useEffect(() => {
@@ -87,16 +88,16 @@ const Header: React.FC = () => {
             ) : (
               <>
                 {pathname !== '/' && (
-                  <IconButton onClick={() => router.back()} sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Retour">
+                  <IconButton onClick={() => router.back()} sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Back">
                     <ArrowBackIcon />
                   </IconButton>
                 )}
                 {isMobile ? (
-                  <IconButton component={Link} href="/login" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Se connecter">
+                  <IconButton component={Link} href="/login" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Login">
                     <LoginIcon />
                   </IconButton>
                 ) : (
-                  <IconButton component={Link} href="/login" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Se connecter">
+                  <IconButton component={Link} href="/login" sx={{ color: '#9ca3af', '&:hover': { color: '#fff' } }} aria-label="Login">
                     <LoginIcon />
                   </IconButton>
                 )}
@@ -105,11 +106,12 @@ const Header: React.FC = () => {
           </Box>
 
           {/* Center Section - Logo */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', position: isMobile ? 'absolute' : 'static', left: '50%', transform: isMobile ? 'translateX(-50%)' : 'none' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
               <Typography
                 variant="h5"
                 sx={{
+                  fontWeight: 700,
                   color: '#fff',
                   letterSpacing: '-0.02em',
                   cursor: 'pointer',
@@ -136,7 +138,7 @@ const Header: React.FC = () => {
                   backgroundColor: 'transparent',
                 },
               }}
-              aria-label="Liste de souhaits"
+              aria-label="Wishlist"
             >
               <Badge
                 badgeContent={mounted && isInitialized ? wishlistCount : 0} // Apply badge to wishlist
@@ -162,7 +164,7 @@ const Header: React.FC = () => {
                   backgroundColor: 'transparent',
                 },
               }}
-              aria-label="Panier"
+              aria-label="Cart"
             >
               <Badge
                 badgeContent={mounted && isInitialized ? cartCount : 0} // Only show cartCount if mounted and auth is initialized
@@ -177,6 +179,7 @@ const Header: React.FC = () => {
                 <ShoppingBagIcon />
               </Badge>
             </IconButton>
+
           </Box>
         </Toolbar>
       </Container>

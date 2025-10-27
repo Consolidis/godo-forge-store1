@@ -14,6 +14,8 @@ import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useSnackbar } from 'notistack';
 
+import { convertUSDtoXAF } from '@/lib/currency';
+
 interface ProductCardProps {
   id: string;
   title: string;
@@ -44,10 +46,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const displayVariants = variants.slice(0, 3);
   const currentVariant = variants[selectedVariant] || variants[0];
-  const displayPrice = currentVariant?.sellingPrice || currentVariant?.price || price;
-  const displayImage = currentVariant?.image || 'https://via.placeholder.com/400x400/0a0a0a/FFFFFF?text=Waltech';
+  // const displayPrice = currentVariant?.sellingPrice || currentVariant?.price || price;
+  // const displayImage = currentVariant?.image || 'https://via.placeholder.com/400x400/0a0a0a/FFFFFF?text=Waltech';
 
   const isInWishlist = wishlist?.items?.some(item => item.product.id === id); // Check if product is in wishlist
+
+   const displayPrice = currentVariant?.sellingPrice || currentVariant?.price || price;
+  const displayPriceXAF = convertUSDtoXAF(displayPrice);
+  const displayImage = currentVariant?.image || 'https://via.placeholder.com/400x400/0a0a0a/FFFFFF?text=Waltech';
+
 
   const handleAddToCart = async () => {
     if (!currentVariant || !currentVariant.id) {
@@ -176,8 +183,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </Typography>
           </Link>
 
+
+
           <Typography variant="h5" color="text.primary" sx={{ fontWeight: 'bold', my: 2 }}>
-            {displayPrice?.toFixed(2)} $
+            {displayPriceXAF.toFixed(2)} FCFA
           </Typography>
 
           {displayVariants.length > 0 && (

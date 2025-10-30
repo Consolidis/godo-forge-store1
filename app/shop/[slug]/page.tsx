@@ -30,7 +30,7 @@ interface ProductVariant {
   // Add other variant properties like color, size, etc.
 }
 
-export default function ProductDetailPage({ params }: { params: { slug: string } }) {
+export default function ProductDetailPage({ params, searchParams }: { params: { slug: string }; searchParams: { [key: string]: string | string[] | undefined }; }) {
   const { slug } = params;
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);

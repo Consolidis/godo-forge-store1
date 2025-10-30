@@ -87,7 +87,7 @@ export default function CartPage() {
         </Typography>
 
         <Grid container spacing={4}>
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             {cart.items.map((item) => (
               <Paper key={item.id} sx={{ p: 2, mb: 3, display: 'flex', alignItems: 'center', bgcolor: 'grey.900', color: 'white' }}>
                 <Box sx={{ width: 100, height: 100, position: 'relative', mr: 2 }}>
@@ -124,7 +124,7 @@ export default function CartPage() {
           </Button>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper sx={{ p: 3, bgcolor: 'grey.900', color: 'white' }}>
             <Typography variant="h5" gutterBottom>Résumé de la commande</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>

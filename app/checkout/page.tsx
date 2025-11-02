@@ -31,7 +31,8 @@ const CheckoutPage = () => {
         city: '',
         postalCode: '',
         country: '',
-        phone: ''
+        phone: '',
+        email: ''
     });
     const [paymentLinks, setPaymentLinks] = useState<PaymentLinks | null>(null);
 
@@ -45,6 +46,14 @@ const CheckoutPage = () => {
     };
 
     const handleCheckout = async () => {
+        const requiredFields: (keyof typeof shippingAddress)[] = ['firstName', 'lastName', 'street', 'city', 'country', 'phone', 'email'];
+        for (const field of requiredFields) {
+            if (!shippingAddress[field]) {
+                setError(`Please fill in all required fields. ${field} is missing.`);
+                return;
+            }
+        }
+
         setLoading(true);
         setError('');
 
@@ -128,11 +137,14 @@ const CheckoutPage = () => {
                                 <Grid item xs={12}>
                                     <TextField required name="street" label="Address" fullWidth autoComplete="shipping address-line1" value={shippingAddress.street} onChange={handleInputChange} variant="outlined" sx={textFieldStyles} />
                                 </Grid>
+                                <Grid item xs={12}>
+                                    <TextField required name="email" label="Email" type="email" fullWidth autoComplete="email" value={shippingAddress.email} onChange={handleInputChange} variant="outlined" sx={textFieldStyles} />
+                                </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField required name="city" label="City" fullWidth autoComplete="shipping address-level2" value={shippingAddress.city} onChange={handleInputChange} variant="outlined" sx={textFieldStyles} />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <TextField required name="postalCode" label="Postal Code" fullWidth autoComplete="shipping postal-code" value={shippingAddress.postalCode} onChange={handleInputChange} variant="outlined" sx={textFieldStyles} />
+                                    <TextField name="postalCode" label="Postal Code" fullWidth autoComplete="shipping postal-code" value={shippingAddress.postalCode} onChange={handleInputChange} variant="outlined" sx={textFieldStyles} />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField required name="country" label="Country" fullWidth autoComplete="shipping country" value={shippingAddress.country} onChange={handleInputChange} variant="outlined" sx={textFieldStyles} />

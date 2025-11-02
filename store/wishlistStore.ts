@@ -61,14 +61,8 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
         headers['X-Guest-Wishlist-Token'] = guestToken;
       }
 
-      const response = await api.post('/public/api/v1/wishlist/items', { productId }, { headers });
-      const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
-
-      if (data.guestToken && data.guestToken !== guestToken) {
-        localStorage.setItem(GUEST_WISHLIST_TOKEN_KEY, data.guestToken);
-      }
-      const { totalItems } = updateTotals(data);
-      set({ wishlist: data, totalItems, loading: false });
+      await api.post('/public/api/v1/wishlist/items', { productId }, { headers });
+      get().fetchWishlist(host);
     } catch (error: any) {
       set({ error: error.response?.data?.message || 'Failed to add item to wishlist', loading: false });
     }
@@ -83,14 +77,8 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
         headers['X-Guest-Wishlist-Token'] = guestToken;
       }
 
-      const response = await api.delete(`/public/api/v1/wishlist/items/${itemId}`, { headers });
-      const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
-
-      if (data.guestToken && data.guestToken !== guestToken) {
-        localStorage.setItem(GUEST_WISHLIST_TOKEN_KEY, data.guestToken);
-      }
-      const { totalItems } = updateTotals(data);
-      set({ wishlist: data, totalItems, loading: false });
+      await api.delete(`/public/api/v1/wishlist/items/${itemId}`, { headers });
+      get().fetchWishlist(host);
     } catch (error: any) {
       set({ error: error.response?.data?.message || 'Failed to remove item from wishlist', loading: false });
     }

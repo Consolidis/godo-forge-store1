@@ -81,70 +81,78 @@ export default function CartPage() {
     }
 
     return (
-      <Container maxWidth="lg" sx={{ py: 8, bgcolor: 'black', color: 'white', minHeight: '100vh' }}>
-        <Typography variant="h3" component="h1" gutterBottom>
+      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 }, bgcolor: 'black', color: 'white', minHeight: '100vh' }}>
+        <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ mb: { xs: 4, md: 6 } }}>
           Your Cart
         </Typography>
 
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 8 }}>
-            {cart.items.map((item) => (
-              <Paper key={item.id} sx={{ p: 2, mb: 3, display: 'flex', alignItems: 'center', bgcolor: 'grey.900', color: 'white' }}>
-                <Box sx={{ width: 100, height: 100, position: 'relative', mr: 2 }}>
-                  <Image
-                    src={item.productVariant.image || '/placeholder.png'}
-                    alt={item.productVariant.name || item.productVariant.sku || 'Product Image'}
-                    layout="fill"
-                    objectFit="cover"
-                    priority
-                  />
-                </Box>
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6">{item.productVariant.name || item.productVariant.sku}</Typography>
-                  <Typography variant="body2" color="grey.400">
-                    {item.productVariant.sellingPrice ? `${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(item.productVariant.sellingPrice))} FCFA` : `${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(item.productVariant.price))} FCFA`}
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <IconButton onClick={() => handleUpdateQuantity(item.id, item.quantity, -1)} size="small" sx={{ color: 'white' }}>
-                  <Remove />
-                </IconButton>
-                <Typography sx={{ mx: 1 }}>{item.quantity}</Typography>
-                <IconButton onClick={() => handleUpdateQuantity(item.id, item.quantity, 1)} size="small" sx={{ color: 'white' }}>
-                  <Add />
-                </IconButton>
-                <IconButton onClick={() => handleRemoveItem(item.id)} size="small" sx={{ color: 'red' }}>
-                  <Delete />
-                </IconButton>
-              </Box>
-            </Paper>
-          ))}
-          <Button onClick={handleClearCart} variant="outlined" color="error" startIcon={<Delete />} sx={{ mt: 2 }}>
-            Vider le panier
-          </Button>
-        </Grid>
+        <Grid container spacing={{ xs: 3, md: 6 }}>
+          {/* Cart Items Section */}
+          <Grid item xs={12} md={8}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {cart.items.map((item) => (
+                <Paper key={item.id} elevation={3} sx={{ p: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', bgcolor: 'grey.900', color: 'white', borderRadius: '12px' }}>
+                  <Box sx={{ width: { xs: '100%', sm: 120 }, height: 120, position: 'relative', mr: { xs: 0, sm: 2 }, mb: { xs: 2, sm: 0 }, borderRadius: '8px', overflow: 'hidden' }}>
+                    <Image
+                      src={item.productVariant.image || '/placeholder.png'}
+                      alt={item.productVariant.name || 'Product Image'}
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </Box>
+                  <Box sx={{ flexGrow: 1, width: '100%' }}>
+                    <Typography variant="h6" component="div">{item.productVariant.product.title}</Typography>
+                    <Typography variant="body2" color="grey.400" sx={{ mb: 1 }}>
+                      {item.productVariant.name}
+                    </Typography>
+                    <Typography variant="h6" color="white" sx={{ fontWeight: 'bold' }}>
+                      {item.productVariant.sellingPrice ? `${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(item.productVariant.sellingPrice))} FCFA` : 'Price not available'}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mt: { xs: 2, sm: 0 } }}>
+                    <IconButton onClick={() => handleUpdateQuantity(item.id, item.quantity, -1)} size="small" sx={{ color: 'white' }}>
+                      <Remove />
+                    </IconButton>
+                    <Typography sx={{ mx: 2, fontWeight: 'bold' }}>{item.quantity}</Typography>
+                    <IconButton onClick={() => handleUpdateQuantity(item.id, item.quantity, 1)} size="small" sx={{ color: 'white' }}>
+                      <Add />
+                    </IconButton>
+                    <IconButton onClick={() => handleRemoveItem(item.id)} size="small" sx={{ color: '#f44336', ml: 2 }}>
+                      <Delete />
+                    </IconButton>
+                  </Box>
+                </Paper>
+              ))}
+              {cart.items.length > 0 && (
+                <Button onClick={handleClearCart} variant="outlined" color="error" startIcon={<Delete />} sx={{ mt: 2, alignSelf: 'flex-start' }}>
+                  Vider le panier
+                </Button>
+              )}
+            </Box>
+          </Grid>
 
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Paper sx={{ p: 3, bgcolor: 'grey.900', color: 'white' }}>
-            <Typography variant="h5" gutterBottom>Résumé de la commande</Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography>Sous-total:</Typography>
-              <Typography>{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(totalPrice))} FCFA</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-              <Typography>Livraison:</Typography>
-              <Typography>Calculé à la caisse</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid grey.700', pt: 2 }}>
-              <Typography variant="subtitle1">Total:</Typography>
-              <Typography variant="subtitle1">{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(totalPrice))} FCFA</Typography>
-            </Box>
-            <Button component={Link} href="/checkout" variant="contained" fullWidth sx={{ mt: 3, bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
-              Passer à la caisse
-            </Button>
-          </Paper>
+          {/* Order Summary Section */}
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 3, bgcolor: 'grey.900', color: 'white', borderRadius: '12px', position: { md: 'sticky' }, top: { md: 100 } }}>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Résumé de la commande</Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 2 }}>
+                <Typography color="grey.400">Sous-total:</Typography>
+                <Typography sx={{ fontWeight: 'medium' }}>{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(totalPrice))} FCFA</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                <Typography color="grey.400">Livraison:</Typography>
+                <Typography sx={{ fontWeight: 'medium' }}>Calculé à la caisse</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderColor: 'grey.700', pt: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(totalPrice))} FCFA</Typography>
+              </Box>
+              <Button component={Link} href="/checkout" variant="contained" fullWidth sx={{ mt: 3, py: 1.5, borderRadius: '8px', bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
+                Passer à la caisse
+              </Button>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
-  );
+      </Container>
+    );
 }

@@ -102,7 +102,7 @@ export default function CartPage() {
                 <Box sx={{ flexGrow: 1 }}>
                   <Typography variant="h6">{item.productVariant.name || item.productVariant.sku}</Typography>
                   <Typography variant="body2" color="grey.400">
-                    {item.productVariant.sellingPrice ? `${convertUSDtoXAF(item.productVariant.sellingPrice).toFixed(2)} FCFA` : `${convertUSDtoXAF(item.productVariant.price).toFixed(2)} FCFA`}
+                    {item.productVariant.sellingPrice ? `${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(item.productVariant.sellingPrice))} FCFA` : `${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(item.productVariant.price))} FCFA`}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -129,15 +129,15 @@ export default function CartPage() {
             <Typography variant="h5" gutterBottom>Résumé de la commande</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography>Sous-total:</Typography>
-              <Typography>{convertUSDtoXAF(totalPrice).toFixed(2)} FCFA</Typography>
+              <Typography>{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(totalPrice))} FCFA</Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
               <Typography>Livraison:</Typography>
               <Typography>Calculé à la caisse</Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid grey.700', pt: 2 }}>
-              <Typography variant="h6">Total:</Typography>
-              <Typography variant="h6">{convertUSDtoXAF(totalPrice).toFixed(2)} FCFA</Typography>
+              <Typography variant="subtitle1">Total:</Typography>
+              <Typography variant="subtitle1">{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(totalPrice))} FCFA</Typography>
             </Box>
             <Button component={Link} href="/checkout" variant="contained" fullWidth sx={{ mt: 3, bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
               Passer à la caisse

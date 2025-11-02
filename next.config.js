@@ -1,8 +1,6 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+const nextConfig = {
   images: {
-    domains: ['cf.cjdropshipping.com', 'cbu01.alicdn.com'],
+    domains: ['cf.cjdropshipping.com', 'cbu01.alicdn.com', 'oss-cf.cjdropshipping.com'],
   },
   
   // Ajout de la configuration pour ignorer les erreurs TypeScript lors du build

@@ -185,8 +185,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
 
 
-          <Typography variant="h5" color="text.primary" sx={{ fontWeight: 'bold', my: 2 }}>
-            {displayPriceXAF.toFixed(2)} FCFA
+          <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', my: 2 }}>
+            {new Intl.NumberFormat('fr-FR').format(displayPriceXAF)} FCFA
           </Typography>
 
           {displayVariants.length > 0 && (

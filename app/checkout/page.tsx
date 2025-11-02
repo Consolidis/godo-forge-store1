@@ -226,8 +226,8 @@ const CheckoutPage = () => {
                                 value={shippingMethod}
                                 onChange={handleShippingChange}
                             >
-                                  <FormControlLabel value="standard" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Standard - {convertUSDtoXAF(SHIPPING_COSTS.standard).toFixed(2)} FCFA</Typography>} />
-                                <FormControlLabel value="express" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Express - {convertUSDtoXAF(SHIPPING_COSTS.express).toFixed(2)} FCFA</Typography>} />
+                                  <FormControlLabel value="standard" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Standard - {new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(SHIPPING_COSTS.standard))} FCFA</Typography>} />
+                                <FormControlLabel value="express" control={<Radio sx={{ color: 'white' }} />} label={<Typography sx={{ color: 'white' }}>Express - {new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(SHIPPING_COSTS.express))} FCFA</Typography>} />
                                 
                             </RadioGroup>
                         </FormControl>
@@ -270,14 +270,14 @@ const CheckoutPage = () => {
                                     )}
                                     <Typography variant="body2" color="white">{item.productVariant.product.title} ({item.quantity})</Typography>
                                 </Box>
-                                <Typography variant="body2" color="white">{(convertUSDtoXAF((item.productVariant.sellingPrice ?? item.productVariant.price) * item.quantity)).toFixed(2)} FCFA</Typography>
+                                <Typography variant="body2" color="white">{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF((item.productVariant.sellingPrice ?? item.productVariant.price) * item.quantity))} FCFA</Typography>
                             </Box>
                         ))} 
                         <Box sx={{ mb: 2, mt: 2, borderTop: '1px solid grey.700', pt: 2 }}>
                             <Typography>Total Items: {totalItems}</Typography>
-                            <Typography sx={{ color: 'orange' }}>Subtotal: {totalPriceXAF.toFixed(2)} FCFA</Typography>
-                            <Typography sx={{ color: 'orange' }}>Shipping: {shippingCostXAF.toFixed(2)} FCFA</Typography>
-                            <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold', color: 'orange' }}>Total: {finalTotalXAF.toFixed(2)} FCFA</Typography>
+                            <Typography sx={{ color: 'orange' }}>Subtotal: {new Intl.NumberFormat('fr-FR').format(totalPriceXAF)} FCFA</Typography>
+                            <Typography sx={{ color: 'orange' }}>Shipping: {new Intl.NumberFormat('fr-FR').format(shippingCostXAF)} FCFA</Typography>
+                            <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold', color: 'orange' }}>Total: {new Intl.NumberFormat('fr-FR').format(finalTotalXAF)} FCFA</Typography>
                         </Box>
                         {!paymentLinks ? (
                             <Button

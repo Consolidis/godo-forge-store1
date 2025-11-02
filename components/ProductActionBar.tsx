@@ -37,7 +37,7 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
     if (isMobile) {
       const price = variant.sellingPrice;
       if (price) {
-        setSnackbarMessage(`${convertUSDtoXAF(price).toFixed(2)} FCFA`);
+        setSnackbarMessage(`${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(price))} FCFA`);
         setSnackbarOpen(true);
       }
     }
@@ -145,7 +145,7 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
             }}
             onClick={handleAddToCart}
           >
-            {isLoading ? 'Ajout en cours...' : `Ajouter au Panier ${displayPrice ? `(${convertUSDtoXAF(displayPrice).toFixed(2)} FCFA)` : ''}`}
+            {isLoading ? 'Ajout en cours...' : `Ajouter au Panier ${displayPrice ? `(${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(displayPrice))} FCFA)` : ''}`}
           </Button>
         )}
       </Toolbar>

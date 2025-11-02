@@ -133,8 +133,8 @@ export default function ProductDetailPage({ params, searchParams }: { params: { 
             }}
           />
 
-          <Typography variant="h4" fontWeight="bold" color="primary.light">
-            {selectedVariant?.sellingPrice ? `${convertUSDtoXAF(selectedVariant.sellingPrice).toFixed(2)} FCFA` : ''}
+          <Typography variant="h5" fontWeight="bold" color="primary.light">
+            {selectedVariant?.sellingPrice ? `${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(selectedVariant.sellingPrice))} FCFA` : ''}
           </Typography>
 
           <Typography 

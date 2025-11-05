@@ -5,7 +5,7 @@ import { useShopStore } from '@/store/shopStore'; // Import useShopStore
 
 const Footer: React.FC = () => {
   const { shop } = useShopStore();
-  const shopName = shop?.name || 'GoDo-Forge.com'; // Fallback to default name
+  const shopName = shop?.name || 'godoforge.com'; // Fallback to default name
 
   return (
     <footer className="bg-black text-gray-400 py-8 text-center">

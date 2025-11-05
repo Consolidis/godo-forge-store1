@@ -1,43 +1,34 @@
-"use client";
-
-import type { Metadata } from "next";
+import { AuthProvider } from "@/providers/AuthProvider";
+import SnackbarProviderWrapper from "@/components/SnackbarProviderWrapper";
 import "./globals.css";
-import Header from "../components/Header";
-import ClientOnly from "../components/ClientOnly"; // Import ClientOnly
-import Footer from "../components/Footer";
-import { AuthProvider } from "../providers/AuthProvider";
-
-import SnackbarProviderWrapper from "../components/SnackbarProviderWrapper";
-import ScrollToTopButton from "../components/ScrollToTopButton";
-import { useShopStore } from "../store/shopStore"; // Import useShopStore
-import { useEffect } from "react"; // Import useEffect
+import ShopDataLoader from "../components/ShopDataLoader";
+import ClientOnly from "@/components/ClientOnly";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
+import ShopProvider from "./ShopProvider";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { fetchShop } = useShopStore();
-
-  useEffect(() => {
-    const host = window.location.hostname;
-    fetchShop(host);
-  }, [fetchShop]);
-
   return (
     <html lang="en">
       <body>
         <SnackbarProviderWrapper>
           <AuthProvider>
-
-          <ClientOnly>
-            <Header />
-          </ClientOnly>
-          <br /><br /><br />
-          {children}
-          <Footer />
-          <ScrollToTopButton />
-        </AuthProvider>
+            <ShopDataLoader /> {/* Render ShopDataLoader here */}
+            <ShopProvider>
+              <ClientOnly>
+                <Header />
+              </ClientOnly>
+              <br />
+              {children}
+              <Footer />
+              <ScrollToTopButton />
+            </ShopProvider>
+          </AuthProvider>
         </SnackbarProviderWrapper>
       </body>
     </html>

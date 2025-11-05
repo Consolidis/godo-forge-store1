@@ -59,6 +59,10 @@ const CheckoutPage = () => {
 
         try {
             const guestToken = localStorage.getItem('guest_cart_token');
+            const customerJwtToken = localStorage.getItem('jwt_token');
+            console.log('CheckoutPage: guestToken:', guestToken);
+            console.log('CheckoutPage: customerJwtToken:', customerJwtToken);
+
             const headers: Record<string, string> = {};
             if (guestToken) {
                 headers['X-Guest-Cart-Token'] = guestToken;
@@ -66,7 +70,6 @@ const CheckoutPage = () => {
             // Add X-Shop-Domain header
             headers['X-Shop-Domain'] = window.location.hostname;
 
-            const customerJwtToken = localStorage.getItem('jwt_token');
             if (customerJwtToken) {
                 headers['Authorization'] = `Bearer ${customerJwtToken}`;
                 console.log('CheckoutPage: Sending Authorization header:', headers['Authorization']);
@@ -102,17 +105,9 @@ const CheckoutPage = () => {
     const finalTotalXAF = convertUSDtoXAF(finalTotal);
     const shippingCostXAF = convertUSDtoXAF(shippingCost);
     const totalPriceXAF = convertUSDtoXAF(totalPrice);
-
-// ...
-
-                              
-
-// // ...
-
-                       
-
     return (
         <Container sx={{ mt: { xs: 4, md: 12 }, mb: 8 }}>
+            <>
             <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ mb: { xs: 4, md: 6 }, fontWeight: 'bold' }}>
                 Finalize Your Order
             </Typography>
@@ -214,9 +209,14 @@ const CheckoutPage = () => {
                         </Box>
 
                         {!paymentLinks ? (
+                            <>
                             <Button variant="contained" color="primary" fullWidth disabled={loading} onClick={handleCheckout} sx={{ mt: 2, py: 1.5, borderRadius: '8px', bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
                                 {loading ? <CircularProgress size={24} /> : 'Confirm and Pay'}
                             </Button>
+                            <Box sx={{ mt: 2, textAlign: 'center' }}>
+                                <img src="/trust-badge-placeholder.png" alt="Trust Badge" style={{ maxWidth: '150px', height: 'auto' }} />
+                            </Box>
+                            </>
                         ) : (
                             <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 <Typography align="center" sx={{ mb: 1 }}>Choose your payment method:</Typography>
@@ -232,7 +232,9 @@ const CheckoutPage = () => {
                     </Paper>
                 </Grid>
             </Grid>
+            </>
         </Container>
+        
     );
 };
 

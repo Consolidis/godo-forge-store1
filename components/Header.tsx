@@ -13,10 +13,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore'; // Import useWishlistStore
+import { useShopStore } from '@/store/shopStore'; // Import useShopStore
 import { convertUSDtoXAF } from '@/lib/currency';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout, isInitialized } = useAuth(); // Get isInitialized
+  const { shop } = useShopStore(); // Get shop from useShopStore
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false); // State to track if component has mounted on client
   const theme = useTheme();
@@ -121,7 +123,7 @@ const Header: React.FC = () => {
                   },
                 }}
               >
-                Waltech
+                {shop?.name || 'GoDo-Forge.com'}
               </Typography>
             </Link>
           </Box>

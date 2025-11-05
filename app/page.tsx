@@ -22,7 +22,7 @@ interface Product {
   slug: string;
   description: string;
   imageUrl: string; // Assuming an imageUrl is available
-  price: number; // Assuming a price is available
+  price: number; // Assuming a price is available 
 }
 
 export default function Home() {

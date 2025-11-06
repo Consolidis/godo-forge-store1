@@ -32,13 +32,8 @@ interface ProductVariant {
   // Add other variant properties like color, size, etc.
 }
 
-type Props = {
-  params: { slug: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
 export async function generateMetadata(
-  { params, searchParams }: Props,
+  { params }: { params: { slug: string } },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   try {

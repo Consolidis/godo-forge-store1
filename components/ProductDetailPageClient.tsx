@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import api from '../../../lib/api';
-import { convertUSDtoXAF } from '../../../lib/currency';
+import api from '../lib/api';
+import { convertUSDtoXAF } from '../lib/currency';
 
 import { Container, Box, Typography, CircularProgress, IconButton } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import ProductActionBar from '../../../components/ProductActionBar';
+import ProductActionBar from './ProductActionBar';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useSnackbar } from 'notistack';
 

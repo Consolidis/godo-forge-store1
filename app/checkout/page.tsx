@@ -2,7 +2,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress, Box, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Alert } from '@mui/material';
+import { useShopStore } from '@/store/shopStore';
+import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress, Box, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Alert, Modal, ThemeProvider, createTheme } from '@mui/material';
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
@@ -15,12 +16,23 @@ const SHIPPING_COSTS = {
 
 interface PaymentLinks {
     cardLink: string;
-    whatsappLink: string;
 }
+
+const modalTheme = createTheme({
+    palette: {
+        background: {
+            paper: '#1f2937', // Corresponds to premium-gray-800
+        },
+        text: {
+            primary: '#ffffff',
+        },
+    },
+});
 
 const CheckoutPage = () => {
     const router = useRouter();
     const { cart, totalItems, totalPrice } = useCartStore();
+    const { shop } = useShopStore();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [shippingMethod, setShippingMethod] = useState('standard');
@@ -35,6 +47,11 @@ const CheckoutPage = () => {
         email: ''
     });
     const [paymentLinks, setPaymentLinks] = useState<PaymentLinks | null>(null);
+    const [mobileMoneyModalOpen, setMobileMoneyModalOpen] = useState(false);
+    const [mobileMoneyPhone, setMobileMoneyPhone] = useState('');
+    const [ussdCode, setUssdCode] = useState('');
+    const [mobileMoneyLoading, setMobileMoneyLoading] = useState(false);
+    const [mobileMoneyError, setMobileMoneyError] = useState('');
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -82,7 +99,7 @@ const CheckoutPage = () => {
 
             if (response.status === 200) {
                 const paymentData = response.data;
-                if (paymentData.cardLink && paymentData.whatsappLink) {
+                if (paymentData.cardLink) {
                     setPaymentLinks(paymentData);
                 } else {
                     setError('Failed to get payment links. Please try again.');
@@ -95,6 +112,50 @@ const CheckoutPage = () => {
             console.error(err);
         }
         setLoading(false);
+    };
+
+    const handleOpenMobileMoneyModal = () => {
+        setMobileMoneyModalOpen(true);
+    };
+
+    const handleCloseMobileMoneyModal = () => {
+        setMobileMoneyModalOpen(false);
+        setUssdCode('');
+        setMobileMoneyError('');
+        setMobileMoneyPhone('');
+    };
+
+    const handlePayWithMobileMoney = async () => {
+        if (!mobileMoneyPhone) {
+            setMobileMoneyError('Please enter a phone number.');
+            return;
+        }
+
+        setMobileMoneyLoading(true);
+        setMobileMoneyError('');
+
+        try {
+            const response = await api.post('https://www.dklo.co/api/tara/cmmobile', {
+                apiKey: shop?.taraMoneyApiKey,
+                businessId: shop?.taraMoneyBusinessId,
+                productId: cart?.items.map(item => item.productVariant.id).join(','),
+                productName: cart?.items.map(item => item.productVariant.product.title).join(','),
+                productPrice: finalTotalXAF,
+                phoneNumber: mobileMoneyPhone,
+                webHookUrl: `${window.location.origin}/api/webhooks/taramoney`
+            });
+
+            if (response.data.status === 'SUCCESS') {
+                setUssdCode(response.data.ussdCode);
+            } else {
+                setMobileMoneyError(response.data.message || 'Failed to initiate payment.');
+            }
+        } catch (err) {
+            setMobileMoneyError('An error occurred while initiating payment.');
+            console.error(err);
+        }
+
+        setMobileMoneyLoading(false);
     };
 
 
@@ -220,8 +281,8 @@ const CheckoutPage = () => {
                         ) : (
                             <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 <Typography align="center" sx={{ mb: 1 }}>Choose your payment method:</Typography>
-                                <Button variant="contained" color="success" fullWidth href={paymentLinks.whatsappLink} target="_blank" sx={{ py: 1.5, borderRadius: '8px' }}>
-                                    Pay with WhatsApp
+                                <Button variant="contained" color="secondary" fullWidth onClick={handleOpenMobileMoneyModal} sx={{ py: 1.5, borderRadius: '8px' }}>
+                                    Pay with Mobile Money
                                 </Button>
                                 <Button variant="contained" color="primary" fullWidth href={paymentLinks.cardLink} target="_blank" sx={{ py: 1.5, borderRadius: '8px' }}>
                                     Pay by Card
@@ -233,6 +294,50 @@ const CheckoutPage = () => {
                 </Grid>
             </Grid>
             </>
+            <Modal
+                open={mobileMoneyModalOpen}
+                onClose={handleCloseMobileMoneyModal}
+                aria-labelledby="mobile-money-modal-title"
+                aria-describedby="mobile-money-modal-description"
+            >
+                <ThemeProvider theme={modalTheme}>
+                    <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', color: 'text.primary', border: '2px solid #000', boxShadow: 24, p: 4, borderRadius: '12px' }}>
+                        <Typography id="mobile-money-modal-title" variant="h6" component="h2">
+                            Pay with Mobile Money
+                        </Typography>
+                        {!ussdCode ? (
+                            <Box sx={{ mt: 2 }}>
+                                <TextField
+                                    fullWidth
+                                    label="Phone Number"
+                                    variant="outlined"
+                                    value={mobileMoneyPhone}
+                                    onChange={(e) => setMobileMoneyPhone(e.target.value)}
+                                    sx={textFieldStyles}
+                                />
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ mt: 2 }}
+                                    onClick={handlePayWithMobileMoney}
+                                    disabled={mobileMoneyLoading}
+                                >
+                                    {mobileMoneyLoading ? <CircularProgress size={24} /> : 'Get Payment Code'}
+                                </Button>
+                                {mobileMoneyError && <Typography color="error" sx={{ mt: 2 }}>{mobileMoneyError}</Typography>}
+                            </Box>
+                        ) : (
+                            <Box sx={{ mt: 2 }}>
+                                <Typography>Dial the code below to complete your payment:</Typography>
+                                <Typography variant="h4" component="p" sx={{ mt: 2, fontWeight: 'bold' }}>
+                                    {ussdCode}
+                                </Typography>
+                            </Box>
+                        )}
+                    </Box>
+                </ThemeProvider>
+            </Modal>
         </Container>
         
     );

@@ -54,7 +54,7 @@ const CheckoutPage = () => {
     const [ussdCode, setUssdCode] = useState('');
     const [mobileMoneyLoading, setMobileMoneyLoading] = useState(false);
     const [mobileMoneyError, setMobileMoneyError] = useState('');
-    const [currentOrderId, setCurrentOrderId] = useState<number | null>(null);
+    const [currentOrderNumber, setCurrentOrderNumber] = useState<string | null>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -104,7 +104,7 @@ const CheckoutPage = () => {
                 const paymentData = response.data;
                 if (paymentData.cardLink) {
                     setPaymentLinks(paymentData);
-                    setCurrentOrderId(paymentData.orderId); // Store the orderId
+                    setCurrentOrderNumber(paymentData.orderNumber); // Store the orderNumber
                 } else {
                     setError('Failed to get payment links. Please try again.');
                 }
@@ -135,8 +135,8 @@ const CheckoutPage = () => {
             return;
         }
 
-        if (!currentOrderId) {
-            setMobileMoneyError('Order ID not available. Please try again.');
+        if (!currentOrderNumber) {
+            setMobileMoneyError('Order number not available. Please try again.');
             return;
         }
 
@@ -147,8 +147,8 @@ const CheckoutPage = () => {
             const response = await api.post('https://www.dklo.co/api/tara/cmmobile', {
                 apiKey: shop?.taraMoneyApiKey,
                 businessId: shop?.taraMoneyBusinessId,
-                productId: currentOrderId, // Use the actual order ID
-                productName: `Order ${currentOrderId}`,
+                productId: currentOrderNumber, // Use the actual order number
+                productName: `Order ${currentOrderNumber}`,
                 productPrice: finalTotalXAF,
                 phoneNumber: mobileMoneyPhone,
                 webHookUrl: `${window.location.origin}/api/webhooks/taramoney`

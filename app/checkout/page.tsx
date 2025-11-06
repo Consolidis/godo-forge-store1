@@ -52,6 +52,7 @@ const CheckoutPage = () => {
     const [ussdCode, setUssdCode] = useState('');
     const [mobileMoneyLoading, setMobileMoneyLoading] = useState(false);
     const [mobileMoneyError, setMobileMoneyError] = useState('');
+    const [currentOrderId, setCurrentOrderId] = useState<number | null>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -101,6 +102,7 @@ const CheckoutPage = () => {
                 const paymentData = response.data;
                 if (paymentData.cardLink) {
                     setPaymentLinks(paymentData);
+                    setCurrentOrderId(paymentData.orderId); // Store the orderId
                 } else {
                     setError('Failed to get payment links. Please try again.');
                 }
@@ -126,8 +128,13 @@ const CheckoutPage = () => {
     };
 
     const handlePayWithMobileMoney = async () => {
-        if (!mobileMoneyPhone) {
-            setMobileMoneyError('Please enter a phone number.');
+        if (!validatePhoneNumber(mobileMoneyPhone)) {
+            setMobileMoneyError('Please enter a valid 9-digit phone number starting with 6.');
+            return;
+        }
+
+        if (!currentOrderId) {
+            setMobileMoneyError('Order ID not available. Please try again.');
             return;
         }
 
@@ -138,8 +145,8 @@ const CheckoutPage = () => {
             const response = await api.post('https://www.dklo.co/api/tara/cmmobile', {
                 apiKey: shop?.taraMoneyApiKey,
                 businessId: shop?.taraMoneyBusinessId,
-                productId: cart?.items.map(item => item.productVariant.id).join(','),
-                productName: cart?.items.map(item => item.productVariant.product.title).join(','),
+                productId: currentOrderId, // Use the actual order ID
+                productName: `Order ${currentOrderId}`,
                 productPrice: finalTotalXAF,
                 phoneNumber: mobileMoneyPhone,
                 webHookUrl: `${window.location.origin}/api/webhooks/taramoney`
@@ -156,6 +163,11 @@ const CheckoutPage = () => {
         }
 
         setMobileMoneyLoading(false);
+    };
+
+    const validatePhoneNumber = (phone: string) => {
+        const phoneRegex = /^6\d{8}$/;
+        return phoneRegex.test(phone);
     };
 
 
@@ -281,13 +293,17 @@ const CheckoutPage = () => {
                         ) : (
                             <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 <Typography align="center" sx={{ mb: 1 }}>Choose your payment method:</Typography>
-                                <Button variant="contained" color="secondary" fullWidth onClick={handleOpenMobileMoneyModal} sx={{ py: 1.5, borderRadius: '8px' }}>
-                                    Pay with Mobile Money
+                                <Button variant="contained" color="secondary" fullWidth onClick={handleOpenMobileMoneyModal} sx={{ py: 1.5, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <img src="/mobile-money.jpg" alt="Mobile Money" style={{ height: '24px' }} />
+                                    <span>Pay with Mobile Money</span>
                                 </Button>
                                 <Button variant="contained" color="primary" fullWidth href={paymentLinks.cardLink} target="_blank" sx={{ py: 1.5, borderRadius: '8px' }}>
-                                    Pay by Card
+                                    <img src="/card.png" alt="Mobile Money" style={{ height: '24px' }} />
+                                    <span>Pay by Card</span>
                                 </Button>
+                                 <img src="/badge.jpg" alt="Trust Badge" style={{ maxWidth: '100%', height: 'auto' }} />
                             </Box>
+                            
                         )}
                         {error && <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>{error}</Typography>}
                     </Paper>
@@ -305,6 +321,7 @@ const CheckoutPage = () => {
                         <Typography id="mobile-money-modal-title" variant="h6" component="h2">
                             Pay with Mobile Money
                         </Typography>
+                        <img src="/mobile-money.jpg" alt="Mobile Money Operators" style={{ width: '100%', marginTop: '16px', borderRadius: '8px' }} />
                         {!ussdCode ? (
                             <Box sx={{ mt: 2 }}>
                                 <TextField

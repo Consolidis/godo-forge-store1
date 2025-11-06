@@ -55,7 +55,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        Chargement...
+        <img src={shopInfo?.themeCustomization?.logo} style={{height:'20%', width:'40%'}}/>
       </div>
     );
   }
@@ -92,7 +92,7 @@ export default function Home() {
               Style={{color:'white'}}
               className="text-5xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text "
             >
-              {shopInfo?.name || 'Waltechvv'}
+              <img src={shopInfo?.themeCustomization?.logo} style={{height:'20%', width:'50%'}}/>
             </motion.h1>
             
             {shopInfo?.themeCustomization?.description && (

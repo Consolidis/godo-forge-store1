@@ -23,7 +23,7 @@ export default function RootLayout({
               <ClientOnly>
                 <Header />
               </ClientOnly>
-              <br />
+              <br /><br /><br />
               {children}
               <Footer />
               <ScrollToTopButton />

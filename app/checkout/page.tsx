@@ -214,7 +214,7 @@ const CheckoutPage = () => {
                                 {loading ? <CircularProgress size={24} /> : 'Confirm and Pay'}
                             </Button>
                             <Box sx={{ mt: 2, textAlign: 'center' }}>
-                                <img src="/trust-badge-placeholder.png" alt="Trust Badge" style={{ maxWidth: '150px', height: 'auto' }} />
+                                <img src="/badge.jpg" alt="Trust Badge" style={{ maxWidth: '100%', height: 'auto' }} />
                             </Box>
                             </>
                         ) : (

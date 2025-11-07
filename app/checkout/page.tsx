@@ -146,20 +146,27 @@ const CheckoutPage = () => {
         setMobileMoneyError('');
 
         try {
-            const response = await api.post('https://www.dklo.co/api/tara/cmmobile', {
-                apiKey: shop?.taraMoneyApiKey,
-                businessId: shop?.taraMoneyBusinessId,
-                productId: currentPaymentGatewayReference, // Use the actual payment gateway reference
-                productName: `Order ${currentOrderNumber}`,
-                productPrice: finalTotalXAF,
-                phoneNumber: mobileMoneyPhone,
-                webHookUrl: `${window.location.origin}/api/webhooks/taramoney`
+            // Step 1: Refresh the payment reference
+            const refreshResponse = await api.post('/public/api/v1/refresh-payment-reference', {
+                paymentGatewayReference: currentPaymentGatewayReference,
             });
 
-            if (response.data.status === 'SUCCESS') {
-                setUssdCode(response.data.ussdCode);
+            const newReference = refreshResponse.data.paymentGatewayReference;
+            setCurrentPaymentGatewayReference(newReference); // Update state with the new reference
+
+            // Step 2: Initiate payment with the new reference
+            const headers: Record<string, string> = {};
+            headers['X-Shop-Domain'] = window.location.hostname;
+
+            const paymentResponse = await api.post('/public/api/v1/initiate-mobile-payment', {
+                paymentGatewayReference: newReference,
+                phoneNumber: mobileMoneyPhone,
+            }, { headers });
+
+            if (paymentResponse.data.status === 'SUCCESS') {
+                setUssdCode(paymentResponse.data.ussdCode);
             } else {
-                setMobileMoneyError(response.data.message || 'Failed to initiate payment.');
+                setMobileMoneyError(paymentResponse.data.message || 'Failed to initiate payment.');
             }
         } catch (err) {
             setMobileMoneyError('An error occurred while initiating payment.');

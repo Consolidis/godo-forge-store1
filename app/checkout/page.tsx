@@ -3,13 +3,51 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useShopStore } from '@/store/shopStore';
-import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress, Box, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Alert, Modal, ThemeProvider, createTheme } from '@mui/material';
+import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress, Box, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Alert, Modal, ThemeProvider, createTheme, Select, MenuItem, InputLabel } from '@mui/material';
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { convertUSDtoXAF, USD_TO_XAF_RATE } from '@/lib/currency';
+
+// Static list of countries (ISO 3166-1 alpha-2 codes and names)
+const countriesList = [
+  { code: 'US', name: 'United States' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'FR', name: 'France' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'CM', name: 'Cameroon' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'ES', name: 'Spain' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'BE', name: 'Belgium' },
+  { code: 'CH', name: 'Switzerland' },
+  { code: 'LU', name: 'Luxembourg' },
+  { code: 'PT', name: 'Portugal' },
+  { code: 'NL', name: 'Netherlands' },
+  { code: 'AT', name: 'Austria' },
+  { code: 'IE', name: 'Ireland' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'NZ', name: 'New Zealand' },
+  { code: 'ZA', name: 'South Africa' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'AR', name: 'Argentina' },
+  { code: 'CL', name: 'Chile' },
+  { code: 'CO', name: 'Colombia' },
+  { code: 'PE', name: 'Peru' },
+  { code: 'CN', name: 'China' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'KR', name: 'South Korea' },
+  { code: 'IN', name: 'India' },
+  { code: 'AE', name: 'United Arab Emirates' },
+  { code: 'SA', name: 'Saudi Arabia' },
+  { code: 'NG', name: 'Nigeria' },
+  { code: 'KE', name: 'Kenya' },
+  { code: 'EG', name: 'Egypt' },
+  // Add more countries as needed
+];
 
 const SHIPPING_COSTS = {
     standard: 5,
@@ -31,13 +69,20 @@ const modalTheme = createTheme({
     },
 });
 
+interface ShippingMethod {
+  id: string;
+  name: string;
+  price: number;
+  description?: string;
+  countries?: string[];
+}
+
 const CheckoutPage = () => {
     const router = useRouter();
     const { cart, totalItems, totalPrice } = useCartStore();
     const { shop } = useShopStore();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [shippingMethod, setShippingMethod] = useState('standard');
     const [shippingAddress, setShippingAddress] = useState({
         firstName: '',
         lastName: '',
@@ -57,13 +102,59 @@ const CheckoutPage = () => {
     const [currentOrderNumber, setCurrentOrderNumber] = useState<string | null>(null);
     const [currentPaymentGatewayReference, setCurrentPaymentGatewayReference] = useState<string | null>(null);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [availableShippingMethods, setAvailableShippingMethods] = useState<ShippingMethod[]>([]);
+    const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string | null>(null);
+    const [shippingMethodsLoading, setShippingMethodsLoading] = useState(true);
+    const [shippingMethodsError, setShippingMethodsError] = useState<string | null>(null);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>) => {
         const { name, value } = e.target;
-        setShippingAddress(prevState => ({ ...prevState, [name]: value }));
+        setShippingAddress(prevState => ({ ...prevState, [name as string]: value }));
     };
 
+    useEffect(() => {
+      const fetchShippingMethods = async () => {
+        if (!shop?.id) {
+          console.log('CheckoutPage: Shop ID is missing.');
+          setShippingMethodsError('Shop ID is missing.');
+          setShippingMethodsLoading(false);
+          return;
+        }
+        setShippingMethodsLoading(true);
+        setShippingMethodsError(null);
+        try {
+          const headers: Record<string, string> = {
+            'X-Shop-Domain': window.location.hostname,
+          };
+          const countryParam = shippingAddress.country ? `?country=${shippingAddress.country}` : '';
+          const apiUrl = `/public/api/v1/shops/${shop.id}/shipping-methods${countryParam}`;
+          console.log('CheckoutPage: Fetching shipping methods from:', apiUrl);
+          console.log('CheckoutPage: X-Shop-Domain header:', window.location.hostname);
+          console.log('CheckoutPage: Current shippingAddress.country:', shippingAddress.country);
+
+          const response = await api.get<ShippingMethod[]>(apiUrl, { headers });
+          console.log('CheckoutPage: Shipping methods API response:', response.data);
+          setAvailableShippingMethods(response.data);
+          if (response.data.length > 0) {
+            setSelectedShippingMethodId(response.data[0].id); // Select the first one by default
+          } else {
+            setSelectedShippingMethodId(null);
+          }
+        } catch (err: any) {
+          console.error('CheckoutPage: Failed to fetch shipping methods:', err.response?.data?.message || err.message);
+          // Assuming notifyError exists, otherwise remove or implement it
+          // notifyError(err.response?.data?.message || 'Failed to fetch shipping methods.');
+        } finally {
+          setShippingMethodsLoading(false);
+        }
+      };
+
+      fetchShippingMethods();
+    }, [shop?.id, shippingAddress.country]); // Re-fetch when shopId or country changes
+
     const handleShippingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setShippingMethod(event.target.value);
+        // This function is no longer directly used for shipping method selection
+        // as we are using selectedShippingMethodId state directly with RadioGroup
     };
 
     const handleCheckout = async () => {
@@ -98,7 +189,7 @@ const CheckoutPage = () => {
 
             const response = await api.post('/public/api/v1/checkout', {
                 shipping_address: shippingAddress,
-                shipping_method: shippingMethod,
+                shipping_method_id: selectedShippingMethodId, // Changed to shipping_method_id
             }, { headers });
 
             if (response.status === 200) {
@@ -184,7 +275,8 @@ const CheckoutPage = () => {
 
 
 
-    const shippingCost = SHIPPING_COSTS[shippingMethod as keyof typeof SHIPPING_COSTS];
+    const selectedMethod = availableShippingMethods.find(method => method.id === selectedShippingMethodId);
+    const shippingCost = selectedMethod ? selectedMethod.price : 0; // Use selected method's price
     const finalTotal = totalPrice + shippingCost;
     const finalTotalXAF = convertUSDtoXAF(finalTotal);
     const shippingCostXAF = convertUSDtoXAF(shippingCost);
@@ -226,7 +318,46 @@ const CheckoutPage = () => {
                                     <TextField name="postalCode" label="Postal Code" fullWidth autoComplete="shipping postal-code" value={shippingAddress.postalCode} onChange={handleInputChange} variant="outlined" sx={textFieldStyles} />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <TextField required name="country" label="Country" fullWidth autoComplete="shipping country" value={shippingAddress.country} onChange={handleInputChange} variant="outlined" sx={textFieldStyles} />
+                                    <FormControl fullWidth required variant="outlined" sx={textFieldStyles}>
+                                        <InputLabel id="country-select-label" sx={textFieldStyles}>Country</InputLabel>
+                                        <Select
+                                            labelId="country-select-label"
+                                            id="country-select"
+                                            name="country"
+                                            value={shippingAddress.country}
+                                            onChange={handleInputChange}
+                                            label="Country"
+                                            sx={textFieldStyles}
+                                            MenuProps={{
+                                                PaperProps: {
+                                                    sx: {
+                                                        bgcolor: 'grey.800',
+                                                        color: 'white',
+                                                        '& .MuiMenuItem-root': {
+                                                            '&:hover': {
+                                                                bgcolor: 'grey.700',
+                                                            },
+                                                            '&.Mui-selected': {
+                                                                bgcolor: 'primary.dark',
+                                                                '&:hover': {
+                                                                    bgcolor: 'primary.main',
+                                                                },
+                                                            },
+                                                        },
+                                                    },
+                                                },
+                                            }}
+                                        >
+                                            <MenuItem value="">
+                                                <em>Select Country</em>
+                                            </MenuItem>
+                                            {countriesList.map((country) => (
+                                                <MenuItem key={country.code} value={country.code}>
+                                                    {country.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField required name="phone" label="Phone" fullWidth autoComplete="tel" value={shippingAddress.phone} onChange={handleInputChange} variant="outlined" sx={textFieldStyles} />
@@ -234,17 +365,36 @@ const CheckoutPage = () => {
                             </Grid>
                         </Paper>
                         <Paper sx={{ p: { xs: 2, md: 3 }, bgcolor: 'grey.900', color: 'white', borderRadius: '12px' }}>
-                            <FormControl component="fieldset">
+                            <FormControl component="fieldset" fullWidth>
                                 <FormLabel component="legend" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>Shipping Method</FormLabel>
-                                <RadioGroup
-                                    aria-label="shipping method"
-                                    name="shippingMethod"
-                                    value={shippingMethod}
-                                    onChange={handleShippingChange}
-                                >
-                                    <FormControlLabel value="standard" control={<Radio sx={{ color: 'white' }} />} label={<Typography>Standard - {new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(SHIPPING_COSTS.standard))} FCFA</Typography>} />
-                                    <FormControlLabel value="express" control={<Radio sx={{ color: 'white' }} />} label={<Typography>Express - {new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(SHIPPING_COSTS.express))} FCFA</Typography>} />
-                                </RadioGroup>
+                                {shippingMethodsLoading ? (
+                                    <CircularProgress size={24} />
+                                ) : shippingMethodsError ? (
+                                    <Alert severity="error">{shippingMethodsError}</Alert>
+                                ) : availableShippingMethods.length === 0 ? (
+                                    <Alert severity="info">No shipping methods available for your country.</Alert>
+                                ) : (
+                                    <RadioGroup
+                                        aria-label="shipping method"
+                                        name="shippingMethodId"
+                                        value={selectedShippingMethodId}
+                                        onChange={(e) => setSelectedShippingMethodId(e.target.value)}
+                                    >
+                                        {availableShippingMethods.map((method) => (
+                                            <FormControlLabel
+                                                key={method.id}
+                                                value={method.id}
+                                                control={<Radio sx={{ color: 'white' }} />}
+                                                label={
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                                        <Typography>{method.name} {method.description ? `(${method.description})` : ''}</Typography>
+                                                        <Typography>{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(method.price))} FCFA</Typography>
+                                                    </Box>
+                                                }
+                                            />
+                                        ))}
+                                    </RadioGroup>
+                                )}
                             </FormControl>
                         </Paper>
                     </Box>

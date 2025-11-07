@@ -55,6 +55,7 @@ const CheckoutPage = () => {
     const [mobileMoneyLoading, setMobileMoneyLoading] = useState(false);
     const [mobileMoneyError, setMobileMoneyError] = useState('');
     const [currentOrderNumber, setCurrentOrderNumber] = useState<string | null>(null);
+    const [currentPaymentGatewayReference, setCurrentPaymentGatewayReference] = useState<string | null>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -105,6 +106,7 @@ const CheckoutPage = () => {
                 if (paymentData.cardLink) {
                     setPaymentLinks(paymentData);
                     setCurrentOrderNumber(paymentData.orderNumber); // Store the orderNumber
+                    setCurrentPaymentGatewayReference(paymentData.paymentGatewayReference);
                 } else {
                     setError('Failed to get payment links. Please try again.');
                 }
@@ -135,8 +137,8 @@ const CheckoutPage = () => {
             return;
         }
 
-        if (!currentOrderNumber) {
-            setMobileMoneyError('Order number not available. Please try again.');
+        if (!currentPaymentGatewayReference) {
+            setMobileMoneyError('Payment reference not available. Please try again.');
             return;
         }
 
@@ -147,7 +149,7 @@ const CheckoutPage = () => {
             const response = await api.post('https://www.dklo.co/api/tara/cmmobile', {
                 apiKey: shop?.taraMoneyApiKey,
                 businessId: shop?.taraMoneyBusinessId,
-                productId: currentOrderNumber, // Use the actual order number
+                productId: currentPaymentGatewayReference, // Use the actual payment gateway reference
                 productName: `Order ${currentOrderNumber}`,
                 productPrice: finalTotalXAF,
                 phoneNumber: mobileMoneyPhone,

@@ -101,6 +101,7 @@ const CheckoutPage = () => {
     const [mobileMoneyError, setMobileMoneyError] = useState('');
     const [currentOrderNumber, setCurrentOrderNumber] = useState<string | null>(null);
     const [currentPaymentGatewayReference, setCurrentPaymentGatewayReference] = useState<string | null>(null);
+    const [currentOrderId, setCurrentOrderId] = useState<string | null>(null); // New state for orderId
 
     const [availableShippingMethods, setAvailableShippingMethods] = useState<ShippingMethod[]>([]);
     const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string | null>(null);
@@ -194,12 +195,10 @@ const CheckoutPage = () => {
 
             if (response.status === 200) {
                 const paymentData = response.data;
-                // Redirect to success page immediately after order creation
-                router.push(`/order/success/${paymentData.orderId}`);
-                // Optionally, you can still set payment links if needed for other payment methods
-                // setPaymentLinks(paymentData);
-                // setCurrentOrderNumber(paymentData.orderNumber);
-                // setCurrentPaymentGatewayReference(paymentData.paymentGatewayReference);
+                setPaymentLinks(paymentData);
+                setCurrentOrderNumber(paymentData.orderNumber);
+                setCurrentPaymentGatewayReference(paymentData.paymentGatewayReference);
+                setCurrentOrderId(paymentData.orderId); // Store orderId in state
             } else {
                 setError('Order creation failed. Please try again.');
             }
@@ -255,6 +254,13 @@ const CheckoutPage = () => {
 
             if (paymentResponse.data.status === 'SUCCESS') {
                 setUssdCode(paymentResponse.data.ussdCode);
+                // Redirect to success page after mobile money payment initiation
+                if (currentOrderId) {
+                    router.push(`/order/success/${currentOrderId}`);
+                } else {
+                    console.error('CheckoutPage: currentOrderId is null after mobile money initiation.');
+                    setError('An error occurred. Order ID is missing for redirection.');
+                }
             } else {
                 setMobileMoneyError(paymentResponse.data.message || 'Failed to initiate payment.');
             }

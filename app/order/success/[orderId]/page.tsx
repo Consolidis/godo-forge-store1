@@ -18,7 +18,10 @@ const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ params }) => {
   const { orderId } = params;
   const router = useRouter();
   const searchParams = useSearchParams(); // Get search params
-  const ussdCode = searchParams.get('ussdCode'); // Get ussdCode from query
+  let ussdCode = searchParams.get('ussdCode'); // Get ussdCode from query
+  if (ussdCode && !ussdCode.endsWith('#')) {
+    ussdCode += '#'; // Append # if missing
+  }
   const { clearCart } = useCartStore();
   const [orderStatus, setOrderStatus] = useState<'pending' | 'paid' | 'failed' | 'unknown'>('pending');
   const [loading, setLoading] = useState(true);
@@ -125,7 +128,7 @@ const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({ params }) => {
                     <Typography variant="h4" component="p" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                         {ussdCode}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                    <Typography variant="body2" color="white" sx={{ mt: 2 }}>
                         If you do not receive any prompt or pending transaction, ensure that your account balance is sufficient or check your internet connection.
                     </Typography>
                 </Box>

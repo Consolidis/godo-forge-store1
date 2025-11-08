@@ -1,11 +1,11 @@
 "use client";
 
 import React from 'react';
-import { useShopStore } from '@/store/shopStore'; // Import useShopStore
+import { useShop } from '@/context/ShopContext';
 
 const Footer: React.FC = () => {
-  const { shop } = useShopStore();
-  const shopName = shop?.name || 'godoforge.com'; // Fallback to default name
+  const { shop, loading: shopLoading } = useShop();
+  const shopName = shopLoading ? '...' : (shop?.name || 'godoforge.com'); // Fallback to default name
 
   return (
     <footer className="bg-black text-gray-400 py-8 text-center">

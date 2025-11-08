@@ -1,12 +1,11 @@
 import { AuthProvider } from "@/providers/AuthProvider";
 import SnackbarProviderWrapper from "@/components/SnackbarProviderWrapper";
 import "./globals.css";
-import ShopDataLoader from "../components/ShopDataLoader";
+import { ShopProvider } from "../context/ShopContext";
 import ClientOnly from "@/components/ClientOnly";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
-import { ShopProvider } from "../context/ShopContext";
 import { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -69,7 +68,6 @@ export default function RootLayout({
       <body>
         <SnackbarProviderWrapper>
           <AuthProvider>
-            <ShopDataLoader /> {/* Render ShopDataLoader here */}
             <ShopProvider>
               <ClientOnly>
                 <Header />

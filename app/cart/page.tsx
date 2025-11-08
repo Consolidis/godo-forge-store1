@@ -10,6 +10,7 @@ import { useSnackbar } from 'notistack';
 import { useShop } from '@/context/ShopContext';
 import { convertPrice, formatPrice } from '@/lib/currency';
 
+export default function CartPage() {
   const { shop, loading: shopLoading } = useShop();
   const { cart, loading, error, fetchCart, updateItemQuantity, removeItem, clearCart, totalPrice } = useCartStore();
   const { enqueueSnackbar } = useSnackbar();

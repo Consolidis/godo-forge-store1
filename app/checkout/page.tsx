@@ -276,7 +276,8 @@ const CheckoutPage = () => {
 
 
     const selectedMethod = availableShippingMethods.find(method => method.id === selectedShippingMethodId);
-    const shippingCost = selectedMethod ? selectedMethod.price : 0; // Use selected method's price
+    // Convert price to number as it comes from backend as string (DECIMAL type)
+    const shippingCost = selectedMethod ? parseFloat(selectedMethod.price as unknown as string) : 0;
     const finalTotal = totalPrice + shippingCost;
     const finalTotalXAF = convertUSDtoXAF(finalTotal);
     const shippingCostXAF = convertUSDtoXAF(shippingCost);

@@ -6,7 +6,8 @@ import { AddShoppingCart } from '@mui/icons-material';
 
 import { useCartStore } from '@/store/cartStore';
 import { useSnackbar } from 'notistack';
-import { convertUSDtoXAF } from '@/lib/currency';
+import { useShop } from '@/context/ShopContext';
+import { convertPrice, formatPrice } from '@/lib/currency';
 
 interface ProductVariant {
   id: string;
@@ -29,6 +30,7 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false); // New loading state
 
+  const { shop, loading: shopLoading } = useShop();
   const { addItem } = useCartStore();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -36,8 +38,10 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
     onVariantChange(variant);
     if (isMobile) {
       const price = variant.sellingPrice;
-      if (price) {
-        setSnackbarMessage(`${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(price))} FCFA`);
+      if (price && !shopLoading) {
+        const converted = convertPrice(price, shop);
+        const formatted = formatPrice(converted.value, converted.currencyCode);
+        setSnackbarMessage(formatted);
         setSnackbarOpen(true);
       }
     }
@@ -69,7 +73,10 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
     }
   };
 
-  const displayPrice = selectedVariant?.sellingPrice;
+  const displayPriceUSD = selectedVariant?.sellingPrice;
+  const convertedPrice = displayPriceUSD ? convertPrice(displayPriceUSD, shop) : null;
+  const formattedPrice = convertedPrice ? formatPrice(convertedPrice.value, convertedPrice.currencyCode) : '';
+
   const isButtonDisabled = !selectedVariant || !selectedVariant.id || selectedVariant.sellingPrice === null || isLoading; // Update disabled state
 
   return (
@@ -145,7 +152,7 @@ const ProductActionBar: React.FC<ProductActionBarProps> = ({ variants, selectedV
             }}
             onClick={handleAddToCart}
           >
-            {isLoading ? 'Ajout en cours...' : `Ajouter au Panier ${displayPrice ? `(${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(displayPrice))} FCFA)` : ''}`}
+            {isLoading ? 'Ajout en cours...' : `Ajouter au Panier ${shopLoading ? '...' : (formattedPrice ? `(${formattedPrice})` : '')}`}
           </Button>
         )}
       </Toolbar>

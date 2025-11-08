@@ -6,12 +6,32 @@ import ClientOnly from "@/components/ClientOnly";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
-import ShopProvider from "./ShopProvider";
+import { ShopProvider } from "../context/ShopContext";
 import { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const shop = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/public/api/v1/shop`).then((res) => res.json());
+    const host = process.env.NEXT_PUBLIC_API_HOST;
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+    if (!host || !apiKey) {
+      throw new Error('API host or key is not configured for metadata generation.');
+    }
+
+    const response = await fetch(`${apiUrl}/public/api/v1/shop`, {
+      headers: {
+        'X-Shop-Domain': host,
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      next: { revalidate: 3600 } // Revalidate data every hour
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch shop metadata: ${response.statusText}`);
+    }
+
+    const shop = await response.json();
 
     return {
       title: {

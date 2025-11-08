@@ -48,3 +48,13 @@ export interface Wishlist {
   createdAt: string;
   updatedAt: string | null;
 }
+
+export interface Shop {
+  id: string;
+  name: string;
+  domaine: string;
+  is_active: boolean;
+  shopType: string;
+  displayCurrencyCode: string;
+  exchangeRates: { [key: string]: number };
+}

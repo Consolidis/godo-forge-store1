@@ -14,7 +14,8 @@ import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useSnackbar } from 'notistack';
 
-import { convertUSDtoXAF } from '@/lib/currency';
+import { useShop } from '@/context/ShopContext';
+import { convertPrice, formatPrice } from '@/lib/currency';
 
 interface ProductCardProps {
   id: string;
@@ -51,9 +52,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const isInWishlist = wishlist?.items?.some(item => item.product.id === id); // Check if product is in wishlist
 
-   const displayPrice = currentVariant?.sellingPrice || currentVariant?.price || price;
-  const displayPriceXAF = convertUSDtoXAF(displayPrice);
+  const { shop, loading: shopLoading } = useShop();
+
+  const displayPriceUSD = currentVariant?.sellingPrice || currentVariant?.price || price;
   const displayImage = currentVariant?.image || 'https://via.placeholder.com/400x400/0a0a0a/FFFFFF?text=Waltech';
+
+  const convertedPrice = convertPrice(displayPriceUSD, shop);
+  const formattedPrice = formatPrice(convertedPrice.value, convertedPrice.currencyCode);
 
 
   const handleAddToCart = async () => {
@@ -186,7 +191,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
 
           <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', my: 2 }}>
-            {new Intl.NumberFormat('fr-FR').format(displayPriceXAF)} FCFA
+            {shopLoading ? '...' : formattedPrice}
           </Typography>
 
           {displayVariants.length > 0 && (

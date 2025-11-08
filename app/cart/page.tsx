@@ -7,9 +7,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
 import { useSnackbar } from 'notistack';
-import { convertUSDtoXAF } from '@/lib/currency';
+import { useShop } from '@/context/ShopContext';
+import { convertPrice, formatPrice } from '@/lib/currency';
 
-export default function CartPage() {
+  const { shop, loading: shopLoading } = useShop();
   const { cart, loading, error, fetchCart, updateItemQuantity, removeItem, clearCart, totalPrice } = useCartStore();
   const { enqueueSnackbar } = useSnackbar();
   const [mounted, setMounted] = useState(false); // State to track if component has mounted on client
@@ -48,7 +49,13 @@ export default function CartPage() {
     enqueueSnackbar('Cart cleared!', { variant: 'info' });
   };
 
-  if (loading || !mounted) { // Show loading or empty state until mounted and data is fetched
+  const getFormattedPrice = (priceInUSD: number) => {
+    if (shopLoading) return '...';
+    const converted = convertPrice(priceInUSD, shop);
+    return formatPrice(converted.value, converted.currencyCode);
+  };
+
+  if (loading || !mounted || shopLoading) { // Show loading or empty state until mounted and data is fetched
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'black' }}>
         <CircularProgress color="primary" />
@@ -106,7 +113,7 @@ export default function CartPage() {
                       {item.productVariant.name}
                     </Typography>
                     <Typography variant="h6" color="white" sx={{ fontWeight: 'bold' }}>
-                      {item.productVariant.sellingPrice ? `${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(item.productVariant.sellingPrice))} FCFA` : 'Price not available'}
+                      {item.productVariant.sellingPrice ? getFormattedPrice(item.productVariant.sellingPrice) : 'Price not available'}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: { xs: 2, sm: 0 } }}>
@@ -137,7 +144,7 @@ export default function CartPage() {
               <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Résumé de la commande</Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 2 }}>
                 <Typography color="grey.400">Sous-total:</Typography>
-                <Typography sx={{ fontWeight: 'medium' }}>{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(totalPrice))} FCFA</Typography>
+                <Typography sx={{ fontWeight: 'medium' }}>{getFormattedPrice(totalPrice)}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
                 <Typography color="grey.400">Livraison:</Typography>
@@ -145,7 +152,7 @@ export default function CartPage() {
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderColor: 'grey.700', pt: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(totalPrice))} FCFA</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{getFormattedPrice(totalPrice)}</Typography>
               </Box>
               <Button component={Link} href="/checkout" variant="contained" fullWidth sx={{ mt: 3, py: 1.5, borderRadius: '8px', bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
                 Passer à la caisse

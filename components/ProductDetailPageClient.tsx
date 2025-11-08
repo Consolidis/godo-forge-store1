@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '../lib/api';
-import { convertUSDtoXAF } from '../lib/currency';
+import { useShop } from '@/context/ShopContext';
+import { convertPrice, formatPrice } from '../lib/currency';
 
 import { Container, Box, Typography, CircularProgress, IconButton } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -36,6 +37,7 @@ export default function ProductDetailPageClient({ slug }: { slug: string }) {
   const [error, setError] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
 
+  const { shop, loading: shopLoading } = useShop();
   const { addItem: addWishlistItem } = useWishlistStore();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -71,6 +73,10 @@ export default function ProductDetailPageClient({ slug }: { slug: string }) {
     await addWishlistItem(host, product.id); // Use product ID
     enqueueSnackbar('Item added to wishlist!', { variant: 'success' });
   };
+
+  const displayPriceUSD = selectedVariant?.sellingPrice || selectedVariant?.price || 0;
+  const convertedPrice = convertPrice(displayPriceUSD, shop);
+  const formattedPrice = formatPrice(convertedPrice.value, convertedPrice.currencyCode);
 
   if (loading) {
     return (
@@ -151,7 +157,7 @@ export default function ProductDetailPageClient({ slug }: { slug: string }) {
           />
 
           <Typography variant="h5" fontWeight="bold" color="primary.light">
-            {selectedVariant?.sellingPrice ? `${new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(selectedVariant.sellingPrice))} FCFA` : ''}
+            {shopLoading ? '...' : (selectedVariant?.sellingPrice ? formattedPrice : '')}
           </Typography>
 
           <Typography 

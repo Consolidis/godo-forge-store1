@@ -9,7 +9,7 @@ import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
-import { convertUSDtoXAF, USD_TO_XAF_RATE } from '@/lib/currency';
+import { convertPrice, formatPrice } from '@/lib/currency';
 
 // Static list of countries (ISO 3166-1 alpha-2 codes and names)
 const countriesList = [
@@ -283,10 +283,11 @@ const CheckoutPage = () => {
     const selectedMethod = availableShippingMethods.find(method => method.id === selectedShippingMethodId);
     // Convert price to number as it comes from backend as string (DECIMAL type)
     const shippingCost = selectedMethod ? parseFloat(selectedMethod.price as unknown as string) : 0;
-    const finalTotal = totalPrice + shippingCost;
-    const finalTotalXAF = convertUSDtoXAF(finalTotal);
-    const shippingCostXAF = convertUSDtoXAF(shippingCost);
-    const totalPriceXAF = convertUSDtoXAF(totalPrice);
+    const finalTotalUSD = totalPrice + shippingCost;
+
+    const convertedSubtotal = convertPrice(totalPrice, shop);
+    const convertedShippingCost = convertPrice(shippingCost, shop);
+    const convertedFinalTotal = convertPrice(finalTotalUSD, shop);
     return (
         <Container sx={{ mt: { xs: 4, md: 12 }, mb: 8 }}>
             <>
@@ -428,7 +429,9 @@ const CheckoutPage = () => {
                                             <Typography variant="body2" color="grey.400">Qty: {item.quantity}</Typography>
                                         </Box>
                                     </Box>
-                                    <Typography variant="body1" color="white" sx={{ fontWeight: 'medium' }}>{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF((item.productVariant.sellingPrice ?? item.productVariant.price) * item.quantity))} FCFA</Typography>
+                                    <Typography variant="body1" color="white" sx={{ fontWeight: 'medium' }}>
+                                        {formatPrice(convertPrice((item.productVariant.sellingPrice ?? item.productVariant.price) * item.quantity, shop).value, convertPrice((item.productVariant.sellingPrice ?? item.productVariant.price) * item.quantity, shop).currencyCode)}
+                                    </Typography>
                                 </Box>
                             ))}
                         </Box>
@@ -436,15 +439,15 @@ const CheckoutPage = () => {
                         <Box sx={{ mb: 2, mt: 3, borderTop: '1px solid', borderColor: 'grey.700', pt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <Typography color="grey.400">Subtotal:</Typography>
-                                <Typography sx={{ fontWeight: 'medium' }}>{new Intl.NumberFormat('fr-FR').format(totalPriceXAF)} FCFA</Typography>
+                                <Typography sx={{ fontWeight: 'medium' }}>{formatPrice(convertedSubtotal.value, convertedSubtotal.currencyCode)}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <Typography color="grey.400">Shipping:</Typography>
-                                <Typography sx={{ fontWeight: 'medium' }}>{new Intl.NumberFormat('fr-FR').format(shippingCostXAF)} FCFA</Typography>
+                                <Typography sx={{ fontWeight: 'medium' }}>{formatPrice(convertedShippingCost.value, convertedShippingCost.currencyCode)}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'grey.700' }}>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{new Intl.NumberFormat('fr-FR').format(finalTotalXAF)} FCFA</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{formatPrice(convertedFinalTotal.value, convertedFinalTotal.currencyCode)}</Typography>
                             </Box>
                         </Box>
 

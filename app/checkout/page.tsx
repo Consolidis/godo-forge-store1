@@ -194,13 +194,12 @@ const CheckoutPage = () => {
 
             if (response.status === 200) {
                 const paymentData = response.data;
-                if (paymentData.cardLink) {
-                    setPaymentLinks(paymentData);
-                    setCurrentOrderNumber(paymentData.orderNumber); // Store the orderNumber
-                    setCurrentPaymentGatewayReference(paymentData.paymentGatewayReference);
-                } else {
-                    setError('Failed to get payment links. Please try again.');
-                }
+                // Redirect to success page immediately after order creation
+                router.push(`/order/success/${paymentData.orderId}`);
+                // Optionally, you can still set payment links if needed for other payment methods
+                // setPaymentLinks(paymentData);
+                // setCurrentOrderNumber(paymentData.orderNumber);
+                // setCurrentPaymentGatewayReference(paymentData.paymentGatewayReference);
             } else {
                 setError('Order creation failed. Please try again.');
             }
@@ -511,6 +510,9 @@ const CheckoutPage = () => {
                                 <Typography>Dial the code below to complete your payment:</Typography>
                                 <Typography variant="h4" component="p" sx={{ mt: 2, fontWeight: 'bold' }}>
                                     {ussdCode}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                                    If you do not receive any prompt or pending transaction, ensure that your account balance is sufficient or check your internet connection.
                                 </Typography>
                             </Box>
                         )}

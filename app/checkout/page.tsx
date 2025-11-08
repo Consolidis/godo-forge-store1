@@ -256,7 +256,7 @@ const CheckoutPage = () => {
                 setUssdCode(paymentResponse.data.ussdCode);
                 // Redirect to success page after mobile money payment initiation
                 if (currentOrderId) {
-                    router.push(`/order/success/${currentOrderId}`);
+                    router.push(`/order/success/${currentOrderId}?ussdCode=${ussdCode}`);
                 } else {
                     console.error('CheckoutPage: currentOrderId is null after mobile money initiation.');
                     setError('An error occurred. Order ID is missing for redirection.');

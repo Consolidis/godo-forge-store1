@@ -15,6 +15,7 @@ export default function CartPage() {
   const { cart, loading, error, fetchCart, updateItemQuantity, removeItem, clearCart, totalPrice } = useCartStore();
   const { enqueueSnackbar } = useSnackbar();
   const [mounted, setMounted] = useState(false); // State to track if component has mounted on client
+  const [updatingItemId, setUpdatingItemId] = useState<string | null>(null); // New state for item-specific loading
 
   useEffect(() => {
     setMounted(true); // Set mounted to true after initial client-side render
@@ -28,20 +29,34 @@ export default function CartPage() {
   }, [mounted]); // Dependency array includes fetchCart and mounted
 
   const handleUpdateQuantity = async (itemId: string, currentQuantity: number, delta: number) => {
+    setUpdatingItemId(itemId); // Set item being updated
     const newQuantity = currentQuantity + delta;
-    if (newQuantity <= 0) {
-      await handleRemoveItem(itemId);
-    } else {
-      const host = window.location.hostname;
-      await updateItemQuantity(host, itemId, newQuantity);
-      enqueueSnackbar('Cart item quantity updated!', { variant: 'success' });
+    try {
+      if (newQuantity <= 0) {
+        await handleRemoveItem(itemId);
+      } else {
+        const host = window.location.hostname;
+        await updateItemQuantity(host, itemId, newQuantity);
+        enqueueSnackbar('Cart item quantity updated!', { variant: 'success' });
+      }
+    } catch (error) {
+      enqueueSnackbar('Failed to update cart item quantity.', { variant: 'error' });
+    } finally {
+      setUpdatingItemId(null); // Clear item being updated
     }
   };
 
   const handleRemoveItem = async (itemId: string) => {
-    const host = window.location.hostname;
-    await removeItem(host, itemId);
-    enqueueSnackbar('Item removed from cart!', { variant: 'info' });
+    setUpdatingItemId(itemId); // Set item being removed
+    try {
+      const host = window.location.hostname;
+      await removeItem(host, itemId);
+      enqueueSnackbar('Item removed from cart!', { variant: 'info' });
+    } catch (error) {
+      enqueueSnackbar('Failed to remove item from cart.', { variant: 'error' });
+    } finally {
+      setUpdatingItemId(null); // Clear item being removed
+    }
   };
 
   const handleClearCart = async () => {
@@ -118,16 +133,22 @@ export default function CartPage() {
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: { xs: 2, sm: 0 } }}>
-                    <IconButton onClick={() => handleUpdateQuantity(item.id, item.quantity, -1)} size="small" sx={{ color: 'white' }}>
-                      <Remove />
-                    </IconButton>
-                    <Typography sx={{ mx: 2, fontWeight: 'bold' }}>{item.quantity}</Typography>
-                    <IconButton onClick={() => handleUpdateQuantity(item.id, item.quantity, 1)} size="small" sx={{ color: 'white' }}>
-                      <Add />
-                    </IconButton>
-                    <IconButton onClick={() => handleRemoveItem(item.id)} size="small" sx={{ color: '#f44336', ml: 2 }}>
-                      <Delete />
-                    </IconButton>
+                    {updatingItemId === item.id ? (
+                      <CircularProgress size={24} sx={{ color: 'white', mx: 2 }} />
+                    ) : (
+                      <>
+                        <IconButton onClick={() => handleUpdateQuantity(item.id, item.quantity, -1)} size="small" sx={{ color: 'white' }}>
+                          <Remove />
+                        </IconButton>
+                        <Typography sx={{ mx: 2, fontWeight: 'bold' }}>{item.quantity}</Typography>
+                        <IconButton onClick={() => handleUpdateQuantity(item.id, item.quantity, 1)} size="small" sx={{ color: 'white' }}>
+                          <Add />
+                        </IconButton>
+                        <IconButton onClick={() => handleRemoveItem(item.id)} size="small" sx={{ color: '#f44336', ml: 2 }}>
+                          <Delete />
+                        </IconButton>
+                      </>
+                    )}
                   </Box>
                 </Paper>
               ))}

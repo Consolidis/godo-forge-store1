@@ -4,8 +4,9 @@ import React, { useEffect, useState } from 'react';
 import api from '../lib/api';
 import { useShop } from '@/context/ShopContext';
 import { convertPrice, formatPrice } from '../lib/currency';
+import Link from 'next/link';
 
-import { Container, Box, Typography, CircularProgress, IconButton } from '@mui/material';
+import { Container, Box, Typography, CircularProgress, IconButton, Button } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ProductActionBar from './ProductActionBar';
 import { useWishlistStore } from '@/store/wishlistStore';
@@ -123,59 +124,79 @@ export default function ProductDetailPageClient({ slug }: { slug: string }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Container maxWidth="md" sx={{ py: 5 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          textAlign: 'center', 
-          gap: 4 
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="h3" component="h1" fontWeight="bold">
-              {product.title}
-            </Typography>
-            <IconButton
-              sx={{ color: 'white' }}
-              onClick={handleAddToWishlist}
-              aria-label="Add to wishlist"
-            >
-              <FavoriteBorderIcon />
-            </IconButton>
-          </Box>
-
-          <Box 
-            component="img"
-            src={selectedVariant?.image || product.imageUrl}
-            alt={product.title}
-            sx={{ 
-              width: '100%', 
-              maxWidth: '500px', 
-              height: 'auto', 
-              borderRadius: '1rem', 
-              boxShadow: '0 10px 30px rgba(0,0,0,0.5)' 
-            }}
-          />
-
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 4 }}>
+                    <Box sx={{ position: 'relative', width: '100%', maxWidth: '500px' }}> {/* Wrapper for image and icon */}
+                      <Box
+                        component="img"
+                        src={selectedVariant?.image || product.imageUrl}
+                        alt={product.title}
+                        sx={{
+                          width: '100%',
+                          height: 'auto',
+                          borderRadius: '1rem',
+                          boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                        }}
+                      />
+                      <IconButton
+                        sx={{
+                          position: 'absolute',
+                          top: 8,
+                          right: 8,
+                          color: 'white',
+                          backgroundColor: 'rgba(0,0,0,0.5)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(0,0,0,0.7)',
+                          },
+                          zIndex: 1,
+                          display: { xs: 'block', md: 'none' } // Only show on mobile
+                        }}
+                        onClick={handleAddToWishlist}
+                        aria-label="Add to wishlist"
+                      >
+                        <FavoriteBorderIcon />
+                      </IconButton>
+                    </Box>
+        
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant={{ xs: 'h4', md: 'h3' }} component="h1" fontWeight="bold">
+                        {product.title}
+                      </Typography>
+                      <IconButton
+                        sx={{ color: 'white', display: { xs: 'none', md: 'block' } }} // Only show on desktop
+                        onClick={handleAddToWishlist}
+                        aria-label="Add to wishlist"
+                      >
+                        <FavoriteBorderIcon />
+                      </IconButton>
+                    </Box>
           <Typography variant="h5" fontWeight="bold" color="primary.light">
             {shopLoading ? '...' : (selectedVariant?.sellingPrice ? formattedPrice : '')}
           </Typography>
 
-          <Typography 
-            variant="body1" 
-            color="grey.300"
-            sx={{ 
-              maxWidth: '70ch', 
-              lineHeight: 1.8, 
-              '& img': { 
-                maxWidth: '100%', 
-                height: 'auto', 
-                borderRadius: '0.75rem', 
-                my: 2 
-              } 
-            }}
-            dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
-          />
-        </Box>
+                    <Typography
+                      variant="body1"
+                      color="grey.300"
+                      sx={{
+                        maxWidth: '70ch',
+                        lineHeight: 1.8,
+                        '& img': {
+                          maxWidth: '100%',
+                          height: 'auto',
+                          borderRadius: '0.75rem',
+                          my: 2
+                        }
+                      }}
+                      dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }}
+                    />
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      component={Link}
+                      href="/shop"
+                      sx={{ mt: 4, py: 1.5, px: 4, borderRadius: '8px', bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}
+                    >
+                      Explore More
+                    </Button>        </Box>
       </Container>
 
       {product.variants && product.variants.length > 0 && (

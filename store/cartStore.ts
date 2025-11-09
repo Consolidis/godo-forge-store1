@@ -62,7 +62,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   addItem: async (host: string, productVariantId: string, quantity: number) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const guestToken = localStorage.getItem('guest_cart_token');
       const headers: Record<string, string> = { 'X-Shop-Domain': host };
@@ -72,19 +72,19 @@ export const useCartStore = create<CartState>((set, get) => ({
       const response = await api.post('/public/api/v1/cart/items', { productVariantId, quantity }, { headers });
       const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
       const { totalItems, totalPrice } = updateTotals(data);
-      set({ cart: data, totalItems, totalPrice, loading: false });
+      set({ cart: data, totalItems, totalPrice });
       if (data.guestToken) {
         localStorage.setItem('guest_cart_token', data.guestToken);
       } else {
         localStorage.removeItem('guest_cart_token');
       }
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to add item to cart', loading: false });
+      set({ error: error.response?.data?.message || 'Failed to add item to cart' });
     }
   },
 
   updateItemQuantity: async (host: string, itemId: string, quantity: number) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const guestToken = localStorage.getItem('guest_cart_token');
       const headers: Record<string, string> = { 'X-Shop-Domain': host };
@@ -92,15 +92,15 @@ export const useCartStore = create<CartState>((set, get) => ({
       const response = await api.patch(`/public/api/v1/cart/items/${itemId}`, { quantity }, { headers });
       const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
       const { totalItems, totalPrice } = updateTotals(data);
-      set({ cart: data, totalItems, totalPrice, loading: false });
+      set({ cart: data, totalItems, totalPrice });
       if (data.guestToken) { localStorage.setItem('guest_cart_token', data.guestToken); } else { localStorage.removeItem('guest_cart_token'); }
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to update item quantity', loading: false });
+      set({ error: error.response?.data?.message || 'Failed to update item quantity' });
     }
   },
 
   removeItem: async (host: string, itemId: string) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const guestToken = localStorage.getItem('guest_cart_token');
       const headers: Record<string, string> = { 'X-Shop-Domain': host };
@@ -108,15 +108,15 @@ export const useCartStore = create<CartState>((set, get) => ({
       const response = await api.delete(`/public/api/v1/cart/items/${itemId}`, { headers });
       const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
       const { totalItems, totalPrice } = updateTotals(data);
-      set({ cart: data, totalItems, totalPrice, loading: false });
+      set({ cart: data, totalItems, totalPrice });
       if (data.guestToken) { localStorage.setItem('guest_cart_token', data.guestToken); } else { localStorage.removeItem('guest_cart_token'); }
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to remove item from cart', loading: false });
+      set({ error: error.response?.data?.message || 'Failed to remove item from cart' });
     }
   },
 
   clearCart: async (host: string) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const guestToken = localStorage.getItem('guest_cart_token');
       const headers: Record<string, string> = { 'X-Shop-Domain': host };
@@ -124,24 +124,24 @@ export const useCartStore = create<CartState>((set, get) => ({
       const response = await api.post('/public/api/v1/cart/clear', {}, { headers });
       const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
       const { totalItems, totalPrice } = updateTotals(data);
-      set({ cart: data, totalItems, totalPrice, loading: false });
+      set({ cart: data, totalItems, totalPrice });
       if (data.guestToken) { localStorage.setItem('guest_cart_token', data.guestToken); } else { localStorage.removeItem('guest_cart_token'); }
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to clear cart', loading: false });
+      set({ error: error.response?.data?.message || 'Failed to clear cart' });
     }
   },
 
   mergeCart: async (host: string, guestToken: string) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const headers: Record<string, string> = { 'X-Shop-Domain': host };
       const response = await api.post('/public/api/v1/cart/merge', { guestToken }, { headers });
       const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
       const { totalItems, totalPrice } = updateTotals(data);
-      set({ cart: data, totalItems, totalPrice, loading: false });
+      set({ cart: data, totalItems, totalPrice });
       if (data.guestToken) { localStorage.setItem('guest_cart_token', data.guestToken); } else { localStorage.removeItem('guest_cart_token'); }
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to merge cart', loading: false });
+      set({ error: error.response?.data?.message || 'Failed to merge cart' });
     }
   },
 

@@ -143,7 +143,7 @@ const HorizontalProductGrid: React.FC<HorizontalProductGridProps> = ({
             }}>
               <IconButton
                 onClick={() => scroll('right')}
-                aria-label="Défiler vers la droite"
+                aria-label="Scroll to the right"
                 sx={{
                   bgcolor: 'white',
                   border: '2px solid #e5e7eb',
@@ -166,7 +166,7 @@ const HorizontalProductGrid: React.FC<HorizontalProductGridProps> = ({
         {/* Scroll Indicator - Mobile */}
         <div className="lg:hidden mt-4 text-center">
           <p className="text-sm text-gray-500">
-            Faites glisser pour voir plus →
+            Swipe to see more →
           </p>
         </div>
       </div>

@@ -70,7 +70,7 @@ export default async function ShopPage() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h3" component="h1" gutterBottom>
-        Notre Collection
+        New Collection
       </Typography>
       <br/><br /><br /><br/><br /><br />
       

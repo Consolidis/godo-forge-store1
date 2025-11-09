@@ -95,53 +95,15 @@ export default function HomePageClient() {
               <img src={shopInfo?.themeCustomization?.logo} style={{height:'20%', width:'50%'}}/>
             </motion.h1>
             
-            {shopInfo?.themeCustomization?.description && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="text-xl lg:text-2xl text-gray-400 max-w-3xl mx-auto mb-12"
-                dangerouslySetInnerHTML={{ __html: shopInfo.themeCustomization.description }}
-              />
-            )}
-
-            <br /><br /><br /><br />
+           
+           
             
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              {/* <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, justifyContent: 'center', alignItems: 'center' }}> */}
-            {/* <Typography variant="h4" component="h1" sx={{ color: 'white', fontWeight: 'bold', mb: 2 }}>
-              Discover the Collection
-            </Typography> */}
-            {/* <Typography variant="h6" sx={{ color: 'grey.400', mb: 4 }}>
-              Explore our exclusive collection of smartwatches that combine cutting-edge technology with refined design.
-            </Typography> */}
-
-           
-          {/* </Box> */}
-
-        {/* Must-Haves Section */}
-        {/* <Box sx={{ mt: 8, mb: 4 }}>
-          <Typography variant="h4" component="h2" align="center" gutterBottom color="white">
-            Must-Haves
-          </Typography>
-        </Box> */}
-
-        {/* Call to Action Section */}
-        {/* <Box sx={{ py: 8, bgcolor: 'grey.900', textAlign: 'center' }}> */}
-          {/* <Typography variant="h5" component="h3" sx={{ color: 'white', mb: 3 }}>
-            Ready to redefine your time?
-          </Typography>
-          <Typography variant="body1" sx={{ color: 'grey.400', mb: 4 }}>
-            Join the Watchtech revolution. Explore our smartwatches and find the one that suits you.
-          </Typography>
-          <Button component={Link} href="/shop" variant="contained" sx={{ bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
-            Explore Now
-          </Button> */}
-        {/* </Box> */}
+             
 
         <br /><br />
                 {!isAuthenticated && (
@@ -159,7 +121,7 @@ export default function HomePageClient() {
                       '&:hover': { borderColor: 'grey.400', bgcolor: 'rgba(255, 255, 255, 0.1)' }
                     }}
                   >
-                    Créer un Compte
+                     open my account
                   </Button>
                 )}
 
@@ -191,7 +153,7 @@ export default function HomePageClient() {
       {/* Featured Products Section */}
       {products.length > 0 && (
         <HorizontalProductGrid
-          title="Les Incontournables"
+          title="The Must-Sees"
           titleColor="white"
           products={products}
         />
@@ -207,10 +169,10 @@ export default function HomePageClient() {
           className="py-16 max-w-7xl mx-auto px-6 lg:px-8 text-center"
         >
           <h3 className="text-3xl font-bold mb-4">
-            Bienvenue, {user?.email?.split('@')[0] || 'Utilisateur'}!
+            Welcome, {user?.email?.split('@')[0] || 'Utilisateur'}!
           </h3>
           <p className="text-gray-400 mb-6">
-            Profitez d'une expérience personnalisée et d'offres exclusives.
+            Enjoy a personalized experience and exclusive offers.
           </p>
         </motion.section>
       )}
@@ -227,7 +189,7 @@ export default function HomePageClient() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-            Redéfinissez votre Style
+            Redefine Your Style
           </h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl mx-auto">
             {shopInfo.themeCustomization.description}
@@ -248,7 +210,7 @@ export default function HomePageClient() {
               '&:hover': { bgcolor: 'grey.200' }
             }}
           >
-            Explorer Maintenant
+            Explore Now
           </Button>
         </div>
         

@@ -4,7 +4,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useShopStore } from '@/store/shopStore';
+import { useShop } from '@/context/ShopContext';
 import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress, Box, RadioGroup, FormControlLabel, Radio, FormControl, FormLabel, Alert, Modal, ThemeProvider, createTheme, Select, MenuItem, InputLabel } from '@mui/material';
 import { useCartStore } from '@/store/cartStore';
 import { useRouter } from 'next/navigation';
@@ -80,7 +80,7 @@ interface ShippingMethod {
 const CheckoutPage = () => {
     const router = useRouter();
     const { cart, totalItems, totalPrice } = useCartStore();
-    const { shop } = useShopStore();
+    const { shop, loading: shopLoading, error: shopError } = useShop();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [shippingAddress, setShippingAddress] = useState({
@@ -115,6 +115,12 @@ const CheckoutPage = () => {
 
     useEffect(() => {
       const fetchShippingMethods = async () => {
+        if (shopLoading || shopError) {
+          console.log('CheckoutPage: Shop data is still loading or an error occurred with shop data.');
+          setShippingMethodsError(shopError || 'Shop data not available.');
+          setShippingMethodsLoading(false);
+          return;
+        }
         if (!shop?.id) {
           console.log('CheckoutPage: Shop ID is missing.');
           setShippingMethodsError('Shop ID is missing.');
@@ -151,7 +157,7 @@ const CheckoutPage = () => {
       };
 
       fetchShippingMethods();
-    }, [shop?.id, shippingAddress.country]); // Re-fetch when shopId or country changes
+    }, [shop?.id, shippingAddress.country, shopLoading, shopError]); // Re-fetch when shopId, country, shopLoading, or shopError changes
 
     const handleShippingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         // This function is no longer directly used for shipping method selection
@@ -395,8 +401,7 @@ const CheckoutPage = () => {
                                                 label={
                                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                                                         <Typography>{method.name} {method.description ? `(${method.description})` : ''}</Typography>
-                                                        <Typography>{new Intl.NumberFormat('fr-FR').format(convertUSDtoXAF(method.price))} FCFA</Typography>
-                                                    </Box>
+                                                                                                                 <Typography>{formatPrice(convertPrice(method.price, shop).value, convertPrice(method.price, shop).currencyCode)}</Typography>                                                    </Box>
                                                 }
                                             />
                                         ))}

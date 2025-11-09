@@ -6,6 +6,7 @@ import ClientOnly from "@/components/ClientOnly";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
+import ShopLoader from "@/components/ShopLoader"; // Import ShopLoader
 import { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -69,13 +70,15 @@ export default function RootLayout({
         <SnackbarProviderWrapper>
           <AuthProvider>
             <ShopProvider>
-              <ClientOnly>
-                <Header />
-              </ClientOnly>
-              <br /><br /><br />
-              {children}
-              <Footer />
-              <ScrollToTopButton />
+              <ShopLoader>
+                <ClientOnly>
+                  <Header />
+                </ClientOnly>
+                <br /><br /><br />
+                {children}
+                <Footer />
+                <ScrollToTopButton />
+              </ShopLoader>
             </ShopProvider>
           </AuthProvider>
         </SnackbarProviderWrapper>

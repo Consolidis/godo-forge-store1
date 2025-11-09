@@ -12,12 +12,12 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-4">
         <p>&copy; {new Date().getFullYear()} {shopName}. All rights reserved.</p>
         <br />
-        <div className="flex justify-center space-x-4 mt-4">
+        {/* <div className="flex justify-center space-x-4 mt-4">
           <a href="#" className="hover:text-white">Contact</a> &nbsp; | &nbsp;
           <a href="#" className="hover:text-white">FAQ</a> &nbsp; | &nbsp;
           <a href="#" className="hover:text-white">Privacy Policy</a> &nbsp; | &nbsp;
           <a href="#" className="hover:text-white">Social Media</a>
-        </div>
+        </div> */}
       </div>
     </footer>
   );

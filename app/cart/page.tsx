@@ -163,21 +163,21 @@ export default function CartPage() {
           {/* Order Summary Section */}
           <Grid item xs={12} md={4}>
             <Paper sx={{ p: 3, bgcolor: 'grey.900', color: 'white', borderRadius: '12px', position: { md: 'sticky' }, top: { md: 100 } }}>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Résumé de la commande</Typography>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Order Summary</Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 2 }}>
-                <Typography color="grey.400">Sous-total:</Typography>
+                <Typography color="grey.400">Subtotal:</Typography>
                 <Typography sx={{ fontWeight: 'medium' }}>{getFormattedPrice(totalPrice)}</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                <Typography color="grey.400">Livraison:</Typography>
-                <Typography sx={{ fontWeight: 'medium' }}>Calculé à la caisse</Typography>
+                <Typography color="grey.400">Shipping:</Typography>
+                <Typography sx={{ fontWeight: 'medium' }}>Calculated at checkout</Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid', borderColor: 'grey.700', pt: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{getFormattedPrice(totalPrice)}</Typography>
               </Box>
               <Button component={Link} href="/checkout" variant="contained" fullWidth sx={{ mt: 3, py: 1.5, borderRadius: '8px', bgcolor: 'white', color: 'black', '&:hover': { bgcolor: 'grey.200' } }}>
-                Passer à la caisse
+                Proceed to Checkout
               </Button>
             </Paper>
           </Grid>

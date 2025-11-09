@@ -123,7 +123,7 @@ const Header: React.FC = () => {
                   },
                 }}
               >
-                {shopLoading ? '...' : (shop?.name || 'GoDo-Forge.com')}
+                {shopLoading ? '...' : (shop?.name || 'GoDo Forge')}
               </Typography>
             </Link>
           </Box>
